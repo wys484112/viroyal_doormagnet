@@ -1,0 +1,61 @@
+server:
+  port: 9000
+
+smshost: 139.196.174.56
+smsport: 20480
+sms_app_key: keSHVPaB9N8jQliRDGZOfwTu
+sms_app_secret: hyM7rb65sgCnoj81piZk4FAL
+sms_appid: doorMagnet
+
+#极光配置
+jpush:
+  APP_KEY: 0e5947cde8ddbd4814d7bd5f
+  MASTER_SECRET: 5f8af902e02a54964f8a5b88
+
+spring:
+  profiles:
+    active: dev
+  jpa:
+     database : MYSQL
+     show-sql : true
+     properties:
+       hibernate:
+         dialect: org.hibernate.dialect.MySQL5Dialect
+
+  datasource:
+          type: org.apache.commons.dbcp.BasicDataSource
+          driver-class-name: com.mysql.jdbc.Driver
+          filters: stat
+          maxActive: 20
+          initialSize: 10
+          maxWait: 20
+          minIdle: 1
+          maxIdle: 10
+          timeBetweenEvictionRunsMillis: 3600000
+          minEvictableIdleTimeMillis: 18000000
+          validationQuery: SELECT 1 FROM DUAL
+          testWhileIdle: true
+          testOnBorrow: true
+          testOnReturn: false
+          poolPreparedStatements: true
+          maxOpenPreparedStatements: 20
+
+---
+spring:
+    profiles: dev
+    master_key: abcdefghijkopqrstuvwxyz123456
+    datasource:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://139.196.108.201:55678/db_door_magnet?zeroDateTimeBehavior=convertToNull&autoReconnect=true&tinyInt1isBit=false&useSSL=false
+        username: root
+        password: iyuyun
+
+listen_port: 9701
+idle_time: 140
+
+---
+spring:
+    profiles: test
+
+listen_port: 9701
+idle_time: 140
