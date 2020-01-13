@@ -1,5 +1,6 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
+import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.viroyal.doormagnet.util.RandomUtil;
+import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -36,14 +38,15 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             MDC.put(RandomUtil.MDC_KEY, RandomUtil.getMDCValue());
-            DeviceMessageBase message = decodeMessage(ctx.channel(), (ByteBuf) msg);
-            if (!message.mIsValid) {
-                return;
-            }
 
-            logger.info("channel=" + ctx.channel() + ", total channel=" + mChannelCount + ", msg=" + message);
-
-            mDispactcher.dispatch(message, MDC.get(RandomUtil.MDC_KEY));
+            
+            logger.info("channel=" + ctx.channel() + ", total channel=" + mChannelCount + ", msg=" + TextUtils.byte2Str((byte[]) msg));
+			ByteBuf buf = ctx.alloc().buffer();
+			Charset charset = Charset.forName("UTF-8");
+			buf.writeCharSequence("server received:"+TextUtils.byte2Str((byte[]) msg), charset);
+			ctx.writeAndFlush(buf);
+			
+//            mDispactcher.dispatch(message, MDC.get(RandomUtil.MDC_KEY));
         } catch (Exception e) {
             logger.error("error, channel=" + ctx.channel() + ", error=" + e.getMessage());
         } finally {

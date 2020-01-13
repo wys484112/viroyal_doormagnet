@@ -19,6 +19,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
@@ -69,10 +71,16 @@ public class DeviceServer implements IDeviceServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // (4)
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readIdleTime, 0, 0));
-                            ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100, 1, 1, 0, 0));
+                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(readIdleTime, 0, 0));                            
+							// Decoders
+//							ch.pipeline().addLast("frameDecoder",
+//									new LengthFieldBasedFrameDecoder(1048576, 0, 4, 0, 4));
+							ch.pipeline().addLast("bytesDecoder", new ByteArrayDecoder());
+							// Encoder
+//							ch.pipeline().addLast("frameEncoder", new LengthFieldPrepender(4));
+							ch.pipeline().addLast("bytesEncoder", new ByteArrayEncoder());
+							
                             ch.pipeline().addLast("decoder", mHandler);
-                            ch.pipeline().addLast(mByteEncoder);
                         }
                     }).option(ChannelOption.SO_BACKLOG, 128) // (5)
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)

@@ -22,6 +22,14 @@ public class TextUtils {
         return sb.toString().trim().toUpperCase(Locale.US);
     }
 
+    public static String byte2Str(byte[] b) {
+        return new String(b);
+    }
+    
+    public static byte[] str2Byte(String src) {
+        return src.getBytes();
+    }
+    
     public static String byte2HexStr(ByteBuf buf) {
         StringBuilder sb = new StringBuilder();
         int iLen = buf.readableBytes();

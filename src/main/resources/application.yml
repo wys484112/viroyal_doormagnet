@@ -50,7 +50,7 @@ spring:
         username: root
         password: iyuyun
 
-listen_port: 9701
+listen_port: 9100
 idle_time: 140
 
 ---
