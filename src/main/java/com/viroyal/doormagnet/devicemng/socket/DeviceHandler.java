@@ -39,7 +39,17 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
         try {
             MDC.put(RandomUtil.MDC_KEY, RandomUtil.getMDCValue());
 
+            DeviceMessageBase message = decodeMessage(ctx.channel(), (byte[]) msg);
+
             
+            logger.info("channels size===="+DeviceServer.ALLCHANNELS_GROUP.size());
+            String messagse=TextUtils.byte2Str((byte[]) msg);
+            logger.info("channels messagse===="+message.toString());
+
+            if(messagse.contains("imei")) {
+            	DeviceServer.ALLCHANNELS_GROUP.add(message);
+            	
+            }
             logger.info("channel=" + ctx.channel() + ", total channel=" + mChannelCount + ", msg=" + TextUtils.byte2Str((byte[]) msg));
 			ByteBuf buf = ctx.alloc().buffer();
 			Charset charset = Charset.forName("UTF-8");
@@ -64,7 +74,7 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        mChannelCount.incrementAndGet();
+        mChannelCount.incrementAndGet();        
         logger.info("channel=" + ctx.channel() + ", total channel=" + mChannelCount + ", id="
                 + ctx.channel().id().asShortText());
 
@@ -95,7 +105,7 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
         return true;
     }
 
-    protected DeviceMessageBase decodeMessage(Channel ch, ByteBuf msg) {
+    protected DeviceMessageBase decodeMessage(Channel ch, byte[] msg) {
         DeviceMessage deviceMessage = new DeviceMessage(ch, DeviceMessage.MSG_READ_DATA, msg, mBizHandler);
         return deviceMessage;
     }

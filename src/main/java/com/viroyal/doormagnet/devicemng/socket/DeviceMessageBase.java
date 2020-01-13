@@ -17,11 +17,29 @@ public class DeviceMessageBase {
 
     public int mDevId;
 
+    public String  imei;
+    
     public DeviceBizHandler mHandler;
 
     public int mWhat; // 参考MSG_READ_IDLE
 
-    // 设备消息内容
+    public Channel getmChannel() {
+		return mChannel;
+	}
+
+	public void setmChannel(Channel mChannel) {
+		this.mChannel = mChannel;
+	}
+
+	public String getImei() {
+		return imei;
+	}
+
+	public void setImei(String imei) {
+		this.imei = imei;
+	}
+
+	// 设备消息内容
     public byte[] mData;
 
     // 这个消息是否有效

@@ -20,41 +20,22 @@ public class DeviceMessage extends DeviceMessageBase {
 
     // 是长度字段之后的数据, 不包含校验位
     public byte[] mPayload = null;
-
-    public DeviceMessage(Channel channel, int what, ByteBuf data, DeviceBizHandler handler) {
+    public DeviceMessage(Channel channel, int what, byte[] data, DeviceBizHandler handler) {
         super(channel, what, handler);
 
         if (data != null) {
-            mData = new byte[data.readableBytes()]; // 包含校验位
-            data.readBytes(mData);
+            mData = new byte[data.length]; // 包含校验位
+            System.arraycopy(data, 0, mData, 0, data.length);
             logger.info(TextUtils.byte2HexStr(mData));
-
-            byte input = mData[0];
-            if (input != (byte)0xAA) {
-                logger.error("not start with 0xAA, input={}, 0xaa={}", input, (byte)0xaa);
-                mIsValid = false;
-                return;
+            
+            String msg=TextUtils.byte2Str(mData);
+            if(msg.contains("imei")) {
+            	imei=msg.substring(5);
             }
-
-            input = mData[1];
-            int len = input - 1;
-            if (len <= 0) {
-                logger.error("invalid packet length:" + len);
-                mIsValid = false;
-                return;
-            }
-
-            byte checksum = Utils.calcChecksum(mData, 1, len + 1);
-            if (checksum != mData[mData.length - 1]) {
-                logger.error("invalid packet checksum, should be " + Integer.toHexString(checksum & 0xFF));
-                mIsValid = false;
-                return;
-            }
-
-            mPayload = new byte[len];
-            System.arraycopy(mData, 2, mPayload, 0, len);
+         
         }
     }
+    
 
     @Override
     public String toString() {
@@ -62,7 +43,7 @@ public class DeviceMessage extends DeviceMessageBase {
         sb.append("[what=");
         sb.append(mWhat);
         if (mData != null) {
-            sb.append(" data=" + TextUtils.byte2HexStr(mData));
+            sb.append(" data=" + TextUtils.byte2Str(mData));
         }
         sb.append("]");
 
