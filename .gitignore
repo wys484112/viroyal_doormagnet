@@ -1,7 +1,10 @@
-/target/
-/.settings/
-/.classpath
-/.project
-/bin/
-.idea/*
+.classpath
+.project
+.settings/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+target/
 *.iml
+.idea/
