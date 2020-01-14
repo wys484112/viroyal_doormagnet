@@ -14,4 +14,9 @@ public interface IDeviceServer {
 	 * 关闭server socket
 	 */
 	void shutdown();
+	
+	/**
+	 * 关闭server socket
+	 */
+	
 }

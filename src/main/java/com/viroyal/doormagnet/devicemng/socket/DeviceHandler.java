@@ -53,10 +53,10 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
             	
             }
             logger.info("channel=" + ctx.channel() + ", total channel=" + mChannelCount + ", msg=" + TextUtils.byte2Str((byte[]) msg));
-			ByteBuf buf = ctx.alloc().buffer();
-			Charset charset = Charset.forName("UTF-8");
-			buf.writeCharSequence("server received:"+TextUtils.byte2Str((byte[]) msg), charset);
-			ctx.writeAndFlush(buf);
+//			ByteBuf buf = ctx.alloc().buffer();
+//			Charset charset = Charset.forName("UTF-8");
+//			buf.writeCharSequence("server received:"+TextUtils.byte2Str((byte[]) msg), charset);
+//			ctx.writeAndFlush(buf);
 			
 //            mDispactcher.dispatch(message, MDC.get(RandomUtil.MDC_KEY));
         } catch (Exception e) {

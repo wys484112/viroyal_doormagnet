@@ -43,12 +43,9 @@ public class DeviceMessage extends DeviceMessageBase {
 	public void setImei(String imei) {
 		this.imei = imei;
 	}
-	@Override
-	public String toString() {
-		return "DeviceMessage [channel=" + channel + ", imei=" + imei + ", headHexStr=" + headHexStr + ", flagHexStr="
-				+ flagHexStr + ", controlHexStr=" + controlHexStr + ", versionHexStr=" + versionHexStr
-				+ ", contentLengthHexStr=" + contentLengthHexStr + ", contentHexStr=" + contentHexStr + ", endsHexStr="
-				+ endsHexStr + "]";
+
+	public String toClientString() {
+		return headHexStr + flagHexStr + controlHexStr + contentLengthHexStr + contentHexStr + endsHexStr;
 	}
 
 }
