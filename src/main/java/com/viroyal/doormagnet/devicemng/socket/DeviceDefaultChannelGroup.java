@@ -21,7 +21,7 @@ public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
     private static final Logger logger = LoggerFactory.getLogger(DeviceDefaultChannelGroup.class);
 
 	//imei对应的DeviceMessage    
-    private final ConcurrentMap<String, DeviceMessageBase> deviceIMEIChannelIdMap = PlatformDependent.newConcurrentHashMap();
+    private final ConcurrentMap<String, Channel> deviceIMEIChannelIdMap = PlatformDependent.newConcurrentHashMap();
     
     private final ChannelFutureListener remover = new ChannelFutureListener() {
         @Override
@@ -51,13 +51,17 @@ public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
 
 
 	
-	public boolean add(DeviceMessageBase message) {
+	public boolean add(DeviceMessage message) {
 		// TODO Auto-generated method stub
 		boolean added = false;
-		if (add(message.getmChannel())) {
-			added = deviceIMEIChannelIdMap.putIfAbsent(message.getImei(), message) == null;
+        logger.info("addaddaddadd  enter");
+
+		if (add(message.getChannel())) {
+	        logger.info("addaddaddadd  DeviceMessageBase "+message.getImei());
+
+			added = deviceIMEIChannelIdMap.putIfAbsent(message.getImei(), message.getChannel()) == null;
 			if(added) {
-				message.getmChannel().closeFuture().addListener(remover);
+				message.getChannel().closeFuture().addListener(remover);
 
 			}
 		}
@@ -66,21 +70,21 @@ public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
 
 
 	public boolean removeDevice(Object channel) {
-		DeviceMessageBase c = null;
+		Channel c = null;
 		// TODO Auto-generated method stub
 		{
-			Iterator<Entry<String, DeviceMessageBase>> entries = deviceIMEIChannelIdMap.entrySet().iterator();
+			Iterator<Entry<String, Channel>> entries = deviceIMEIChannelIdMap.entrySet().iterator();
 
 			while (entries.hasNext()) {
 
-				Entry<String, DeviceMessageBase> entry = entries.next();
-
+				Entry<String, Channel> entry = entries.next();
+				String imei=entry.getKey();
 				System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
 
 				// 注意这里操作了集合,下面的的遍历不会再打印0
-				if (((Channel) channel).id().equals(entry.getValue().getmChannel().id())) {
+				if (((Channel) channel).id().equals(entry.getValue().id())) {
 					c = deviceIMEIChannelIdMap.remove(entry.getKey());
-					logger.info("removedevice====="+c.getImei());
+					logger.info("removedevice imei====="+imei);
 				}
 			}
 
@@ -88,7 +92,7 @@ public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
 		if (c == null) {
 			return false;
 		}
-        c.getmChannel().closeFuture().removeListener(remover);
+        c.closeFuture().removeListener(remover);
 
 		return true;
 	}

@@ -1,6 +1,10 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 
 /**
  * 表示从设备收到的数据，但socket相关的消息也通过这个来传递。
@@ -8,46 +12,89 @@ import io.netty.channel.Channel;
  * @author LiGang
  *
  */
-public class DeviceMessageBase {
-    public static final int MSG_SOCKET_CLOSED = 1;
-    public static final int MSG_READ_IDLE = 2;
-    public static final int MSG_READ_DATA = 100;
+public class DeviceMessageBase implements Serializable{
+	/**
+	 * 
+	 */
+	public static final long serialVersionUID = -2928533155615113557L;
 
-    public Channel mChannel;
-
-    public int mDevId;
-
-    public String  imei;
+	// 报文头
+	public String headHexStr;
+   
+	// 标志位
+	public String flagHexStr;
+	
+	// 控制位
+	public String controlHexStr;
     
-    public DeviceBizHandler mHandler;
+	// 版本位
+	public String versionHexStr;	
 
-    public int mWhat; // 参考MSG_READ_IDLE
+	// 数据区长度
+	public String contentLengthHexStr;
+    
+	// 数据区内容
+	public String contentHexStr;
+    
+	// 结束符
+	public String endsHexStr;
 
-    public Channel getmChannel() {
-		return mChannel;
+	public String getHeadHexStr() {
+		return headHexStr;
 	}
 
-	public void setmChannel(Channel mChannel) {
-		this.mChannel = mChannel;
+	public void setHeadHexStr(String headHexStr) {
+		this.headHexStr = headHexStr;
 	}
 
-	public String getImei() {
-		return imei;
+	public String getFlagHexStr() {
+		return flagHexStr;
 	}
 
-	public void setImei(String imei) {
-		this.imei = imei;
+	public void setFlagHexStr(String flagHexStr) {
+		this.flagHexStr = flagHexStr;
 	}
 
-	// 设备消息内容
-    public byte[] mData;
+	public String getControlHexStr() {
+		return controlHexStr;
+	}
 
-    // 这个消息是否有效
-    public boolean mIsValid = true;
+	public void setControlHexStr(String controlHexStr) {
+		this.controlHexStr = controlHexStr;
+	}
 
-    public DeviceMessageBase(Channel channel, int what, DeviceBizHandler handler) {
-        mChannel = channel;
-        mWhat = what;
-        mHandler = handler;
-    }
+	public String getVersionHexStr() {
+		return versionHexStr;
+	}
+
+	public void setVersionHexStr(String versionHexStr) {
+		this.versionHexStr = versionHexStr;
+	}
+
+	public String getContentLengthHexStr() {
+		return contentLengthHexStr;
+	}
+
+	public void setContentLengthHexStr(String contentLengthHexStr) {
+		this.contentLengthHexStr = contentLengthHexStr;
+	}
+
+	public String getContentHexStr() {
+		return contentHexStr;
+	}
+
+	public void setContentHexStr(String contentHexStr) {
+		this.contentHexStr = contentHexStr;
+	}
+
+	public String getEndsHexStr() {
+		return endsHexStr;
+	}
+
+	public void setEndsHexStr(String endsHexStr) {
+		this.endsHexStr = endsHexStr;
+	}
+    
+   
+ 
 }

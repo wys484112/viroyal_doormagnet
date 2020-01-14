@@ -2,6 +2,10 @@ package com.viroyal.doormagnet.util;
 
 import io.netty.buffer.ByteBuf;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 public class TextUtils {
@@ -75,4 +79,71 @@ public class TextUtils {
         }
         return ret;
     }
+    
+    /**
+     * 	     	String src="383637";    	
+     * 			String asciiStr="867";  
+     * 
+     * @param src
+     * @return
+     */
+    public static String hexStr2AscIIStr(String src) {
+        /* 对输入值进行规范化整理 */
+        src = src.trim().replace(" ", "").toUpperCase(Locale.US);
+
+        StringBuilder asciiStr = new StringBuilder();
+        for(int i=0;i<src.length()-1;i+=2) {
+            String output = src.substring(i, (i + 2));
+            int decimal = Integer.parseInt(output, 16);
+            asciiStr.append((char)decimal);
+        }
+        return asciiStr.toString();
+    }
+    
+    /**
+     * 对象转byte
+     * @param obj
+     * @return
+     */
+    public static byte[] ObjectToByte(Object obj) {  
+        byte[] bytes = null;  
+        try {  
+            // object to bytearray  
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();  
+            ObjectOutputStream oo = new ObjectOutputStream(bo);  
+            oo.writeObject(obj);  
+      
+            bytes = bo.toByteArray();  
+      
+            bo.close();  
+            oo.close();  
+        } catch (Exception e) {  
+            System.out.println("translation" + e.getMessage());  
+            e.printStackTrace();  
+        }  
+        return bytes;  
+    } 
+    
+    /**
+     * byte转对象
+     * @param bytes
+     * @return
+     */
+    public static Object ByteToObject(byte[] bytes) {
+        Object obj = null;
+        try {
+            // bytearray to object
+            ByteArrayInputStream bi = new ByteArrayInputStream(bytes);
+            ObjectInputStream oi = new ObjectInputStream(bi);
+
+            obj = oi.readObject();
+            bi.close();
+            oi.close();
+        } catch (Exception e) {
+            System.out.println("translation" + e.getMessage());
+            e.printStackTrace();
+        }
+        return obj;
+    }
+    
 }

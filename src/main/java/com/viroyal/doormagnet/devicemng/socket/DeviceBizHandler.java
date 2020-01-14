@@ -83,13 +83,7 @@ public class DeviceBizHandler {
         }
         logger.info("mIsProductEnv={}", mIsProductEnv);
     }
-    public void execute(DeviceMessageBase request) {
-        if (request.mWhat == DeviceMessage.MSG_READ_DATA) {
-            onChannelRead(request);
-        } else if (request.mWhat == DeviceMessage.MSG_SOCKET_CLOSED) {
-            // onChannelClose(request.mChannel);
-        }
-    }
+    public void execute(DeviceMessageBase request) {}
 
     /**
      * 收到设备数据时的处理 目前可能的情况是
@@ -98,22 +92,7 @@ public class DeviceBizHandler {
      *
      * @param messageBase
      */
-    protected void onChannelRead(DeviceMessageBase messageBase) {
-        DeviceMessage msg = (DeviceMessage) messageBase;
-        Channel ch = msg.mChannel;
-
-        ByteBuffer bf = ByteBuffer.wrap(msg.mPayload);
-
-        int cmd = bf.get() & 0xff;
-
-        if (cmd == 0x21) { // 设备注册
-            onDevReg(bf, ch, msg.mPayload);
-        } else if (cmd == 0x81) { // 设备上报数据
-            onDevData(bf, ch);
-        } else {
-            logger.error("invalid cmd = {}", Integer.toHexString(cmd));
-        }
-    }
+    protected void onChannelRead(DeviceMessageBase messageBase) {}
 
     private String readSn(ByteBuffer buf) {
         byte[] bytes = new byte[6];

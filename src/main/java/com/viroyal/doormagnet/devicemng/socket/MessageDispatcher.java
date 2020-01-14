@@ -65,28 +65,6 @@ public class MessageDispatcher {
         /**
          * 处理消息队列
          */
-        private void handleMessage() {
-            DeviceBizHandler handler = message.mHandler;
-            if (handler != null) {
-                long start = System.currentTimeMillis();
-                // logger.info("start, message=" + message);
-                logger.info("start");
-
-                try {
-                    handler.execute(message);
-                } catch (Exception e) {
-                    logger.error("error", e);
-                }
-                logger.info("end");
-
-                long end = System.currentTimeMillis();
-                long diff = (end - start);
-                if (diff >= 300) {
-                    logger.warn("逻辑处理时间过长！处理时间(ms)：" + diff);
-                }
-            } else {
-                logger.error("指令未找到");
-            }
-        }
+        private void handleMessage() {}
     }
 }

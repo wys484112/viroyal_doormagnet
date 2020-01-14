@@ -1,8 +1,10 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.hibernate.dialect.Ingres10Dialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -26,6 +28,7 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceHandler.class);
 
+    
     @Autowired
     protected MessageDispatcher mDispactcher;
 
@@ -39,14 +42,13 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
         try {
             MDC.put(RandomUtil.MDC_KEY, RandomUtil.getMDCValue());
 
-            DeviceMessageBase message = decodeMessage(ctx.channel(), (byte[]) msg);
+            DeviceMessage message = decodeMessage(ctx.channel(), (byte[]) msg);
 
             
             logger.info("channels size===="+DeviceServer.ALLCHANNELS_GROUP.size());
-            String messagse=TextUtils.byte2Str((byte[]) msg);
-            logger.info("channels messagse===="+message.toString());
 
-            if(messagse.contains("imei")) {
+
+            {
             	DeviceServer.ALLCHANNELS_GROUP.add(message);
             	
             }
@@ -105,9 +107,44 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
         return true;
     }
 
-    protected DeviceMessageBase decodeMessage(Channel ch, byte[] msg) {
-        DeviceMessage deviceMessage = new DeviceMessage(ch, DeviceMessage.MSG_READ_DATA, msg, mBizHandler);
-        return deviceMessage;
+    protected DeviceMessage decodeMessage(Channel ch, byte[] msg) {
+    	DeviceMessage base =new DeviceMessage();
+    	String message=new String(msg).trim().toUpperCase(Locale.US);
+        logger.info("decodeMessagerevrevererererre=====:"+message.toString());
+
+    	base.setChannel(ch);
+    	base.setHeadHexStr(message.substring(0, 4));
+        logger.info("message.substring(0, 4)=====:"+message.substring(0, 4));
+    	
+    	base.setFlagHexStr(message.substring(4, 6));
+        logger.info("message.substring(4, 6)=====:"+message.substring(4, 6));
+    	
+    	base.setControlHexStr(message.substring(6, 8));
+        logger.info("message.substring(6, 8)=====:"+message.substring(6, 8));
+    	
+    	base.setVersionHexStr(message.substring(8, 10));
+        logger.info("message.substring(8, 10)=====:"+message.substring(8, 10));
+
+    	base.setContentLengthHexStr(message.substring(10, 14));
+        logger.info("message.substring(10, 14)=====:"+message.substring(10, 14));
+
+        Integer dataLength = Integer.valueOf(base.getContentLengthHexStr(),16);
+        logger.info("dataLength=====:"+dataLength);
+
+    	base.setContentHexStr(message.substring(14, dataLength*2+14));
+        logger.info("message.substring(14, dataLength+14)=====:"+message.substring(14, dataLength*2+14));
+
+    	base.setEndsHexStr(message.substring(dataLength*2+14, message.length()));
+        logger.info("message.substring(dataLength+14, message.length()-1)=====:"+message.substring(dataLength*2+14, message.length()));
+
+    	String imeiHexStr=base.getContentHexStr().substring(0, 30);
+        logger.info("imeiHexStr=====:"+imeiHexStr);
+    	
+    	base.setImei(TextUtils.hexStr2AscIIStr(imeiHexStr));
+
+        logger.info("TextUtils.hexStr2AscIIStr(imeiHexStr)=====:"+TextUtils.hexStr2AscIIStr(imeiHexStr));
+
+    	return base;
     }
 
     protected DeviceBizHandler getBizHandler() {

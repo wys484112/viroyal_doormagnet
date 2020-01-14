@@ -16,37 +16,39 @@ import io.netty.channel.Channel;
  *
  */
 public class DeviceMessage extends DeviceMessageBase {
-    private static final Logger logger = LoggerFactory.getLogger(DeviceMessage.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8569740216219574569L;
 
-    // 是长度字段之后的数据, 不包含校验位
-    public byte[] mPayload = null;
-    public DeviceMessage(Channel channel, int what, byte[] data, DeviceBizHandler handler) {
-        super(channel, what, handler);
+	private static final Logger logger = LoggerFactory.getLogger(DeviceMessage.class);
 
-        if (data != null) {
-            mData = new byte[data.length]; // 包含校验位
-            System.arraycopy(data, 0, mData, 0, data.length);
-            logger.info(TextUtils.byte2HexStr(mData));
-            
-            String msg=TextUtils.byte2Str(mData);
-            if(msg.contains("imei")) {
-            	imei=msg.substring(5);
-            }
-         
-        }
-    }
+    private Channel channel;
+    private String imei;
     
+    
+	public DeviceMessage() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Channel getChannel() {
+		return channel;
+	}
+	public void setChannel(Channel channel) {
+		this.channel = channel;
+	}
+	public String getImei() {
+		return imei;
+	}
+	public void setImei(String imei) {
+		this.imei = imei;
+	}
+	@Override
+	public String toString() {
+		return "DeviceMessage [channel=" + channel + ", imei=" + imei + ", headHexStr=" + headHexStr + ", flagHexStr="
+				+ flagHexStr + ", controlHexStr=" + controlHexStr + ", versionHexStr=" + versionHexStr
+				+ ", contentLengthHexStr=" + contentLengthHexStr + ", contentHexStr=" + contentHexStr + ", endsHexStr="
+				+ endsHexStr + "]";
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[what=");
-        sb.append(mWhat);
-        if (mData != null) {
-            sb.append(" data=" + TextUtils.byte2Str(mData));
-        }
-        sb.append("]");
-
-        return sb.toString();
-    }
 }
