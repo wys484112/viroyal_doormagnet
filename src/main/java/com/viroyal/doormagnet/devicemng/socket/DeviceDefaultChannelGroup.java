@@ -1,6 +1,9 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
@@ -15,6 +18,7 @@ import io.netty.channel.ChannelId;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.internal.PlatformDependent;
 
 public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
@@ -96,4 +100,39 @@ public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
 
 		return true;
 	}
+	
+	public DefaultChannelGroup getChannelGroupFromImeis(ArrayList<String> imeis) {
+		DefaultChannelGroup groups = new DefaultChannelGroup("Groups", GlobalEventExecutor.INSTANCE);
+		Iterator<String> list = imeis.iterator();
+		while (list.hasNext()) {
+			String imei = list.next();
+			if (deviceIMEIChannelIdMap.containsKey(imei)) {
+				groups.add(deviceIMEIChannelIdMap.get(imei));
+			}
+		}
+
+		return groups;
+	}
+	
+	public Channel getChannelFromImei(String imei) {
+		if (deviceIMEIChannelIdMap.containsKey(imei)) {
+			return deviceIMEIChannelIdMap.get(imei);
+		}
+		return null;
+
+	}
+	
+    public List<String> getImeisArray() {
+        List<String> aa=new ArrayList<>();
+		Iterator<Entry<String, Channel>> entries = deviceIMEIChannelIdMap.entrySet().iterator();
+		while (entries.hasNext()) {
+
+			Entry<String, Channel> entry = entries.next();
+			String imei=entry.getKey();
+			aa.add(imei);
+		}
+        return aa;
+    }
+    
+	
 }

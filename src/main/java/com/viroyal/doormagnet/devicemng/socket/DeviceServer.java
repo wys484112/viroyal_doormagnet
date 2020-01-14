@@ -3,15 +3,31 @@
  */
 package com.viroyal.doormagnet.devicemng.socket;
 
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
+import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
+import com.viroyal.doormagnet.devicemng.pojo.BindListRsp;
+import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
+import com.viroyal.doormagnet.util.RandomUtil;
+
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -64,6 +80,8 @@ public class DeviceServer implements IDeviceServer {
 
     public static DeviceDefaultChannelGroup ALLCHANNELS_GROUP = new DeviceDefaultChannelGroup("ChannelGroups", GlobalEventExecutor.INSTANCE);
 
+    
+    
     
     @Override
     public void startup() throws Exception {
@@ -139,5 +157,61 @@ public class DeviceServer implements IDeviceServer {
     }
     
     
+    //
+    /**
+     * 通过deviceservice来控制相应的通道
+     */
+    @Scheduled(cron = "5/5 * * * * ?")
+    private void sendToDevice() {
+        logger.info("sendToDevice imei:"+"888888888888888");
+        Channel channel=ALLCHANNELS_GROUP.getChannelFromImei("888888888888888");
+        logger.info("sendToDevic aaaaa");
+
+        if(channel!=null) {
+            logger.info("sendToDevice channel:"+channel.toString());
+
+        	try {
+                logger.info("sendToDevice 1111");
+
+				sendMsg("ttttteeeessssttttt",channel);
+                logger.info("sendToDevice 2222");
+
+			} catch (Exception e) {
+                logger.info("sendToDevice 3333");
+
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+    }
+    
+    
+	public void sendMsg(String text,Channel channel) throws Exception {
+		// Thread.sleep(2 * 1000);
+		ByteBuf buf = channel.alloc().buffer();
+		Charset charset = Charset.forName("UTF-8");
+		buf.writeCharSequence(text, charset);
+		channel.writeAndFlush(buf).addListener(new ChannelFutureListener() {
+
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				// TODO Auto-generated method stub
+				System.out.println("发送成功");
+
+			}
+		});
+	}
+	
+    /**
+     * 获取用户名下的在线设备列表
+     * @param token 用户token
+     * @return BaseResponse
+     * @throws TokenInvalidException exception
+     */
+	@Override
+    public  List<String> getDeviceActiveList() {
+
+        return ALLCHANNELS_GROUP.getImeisArray();
+    }
     
 }

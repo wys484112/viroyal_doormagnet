@@ -18,13 +18,18 @@ import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMapper;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;
+import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
 import com.viroyal.doormagnet.devicemng.service.IDeviceMng;
+import com.viroyal.doormagnet.devicemng.socket.DeviceServer;
+import com.viroyal.doormagnet.devicemng.socket.IDeviceServer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,7 +42,10 @@ public class DeviceMngController {
 
     @Autowired
     private JPushClient mJPushClient;
-
+    
+    @Autowired
+    private IDeviceServer mIDeviceServer;
+    
     @RequestMapping(value = "/push_test", method = RequestMethod.GET)
     public String pushTest(@RequestParam("user_id") String userId, @RequestParam("alert") String alert) {
         String tag = "user_" + userId;
@@ -111,4 +119,11 @@ public class DeviceMngController {
         return mDeviceMng.setDeviceSetting(token, devId, param);
     }
 
+    
+    @GetMapping("v1/listimei")
+    public BaseResponse getDevicessList() {
+        return new DataListResponse(mIDeviceServer.getDeviceActiveList());
+    }
+    
+    
 }

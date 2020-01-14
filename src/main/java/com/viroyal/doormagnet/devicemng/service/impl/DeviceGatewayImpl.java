@@ -77,4 +77,7 @@ public class DeviceGatewayImpl implements IDeviceGateway {
             logger.info("StartupThread run end");
         }
     }
+    
+    
+    
 }
