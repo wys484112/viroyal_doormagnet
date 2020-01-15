@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<context id="context1">
+		<jdbcConnection connectionURL="jdbc:mysql://121.36.240.30:3306/db_road_lamp"
+			driverClass="com.mysql.jdbc.Driver" password="viroyal_003" userId="root" />
+		<javaModelGenerator targetPackage="com.viroyal.doormagnet.devicemng.model"
+			targetProject="src/main/resources" />
+		<sqlMapGenerator targetPackage="mapping"
+			targetProject="src/main/resources" />
+		<javaClientGenerator targetPackage="com.viroyal.doormagnet.devicemng.mapper"
+			targetProject="src/main/resources" type="XMLMAPPER" />
+		<table tableName="t_device_status" domainObjectName="DeviceStatus"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+	</context>
+</generatorConfiguration>
