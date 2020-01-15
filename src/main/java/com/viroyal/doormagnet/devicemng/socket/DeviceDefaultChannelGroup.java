@@ -61,7 +61,7 @@ public class DeviceDefaultChannelGroup extends DefaultChannelGroup{
         logger.info("addaddaddadd  enter");
 
 		if (add(message.getChannel())) {
-	        logger.info("addaddaddadd  DeviceMessageBase "+message.getImei());
+	        logger.info("addaddaddadd  DeviceMessage "+message.getImei());
 
 			added = deviceIMEIChannelIdMap.putIfAbsent(message.getImei(), message.getChannel()) == null;
 			if(added) {
