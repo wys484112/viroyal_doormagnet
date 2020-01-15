@@ -1,6 +1,8 @@
 package com.viroyal.doormagnet;
 
 import com.viroyal.doormagnet.devicemng.service.IDeviceGateway;
+
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableScheduling
 @EnableTransactionManagement
+@MapperScan("com.viroyal.doormagnet.devicemng.mapper")
 public class DoorMagnetApplication {
     private static final Logger Logger = LoggerFactory.getLogger(DoorMagnetApplication.class);
 

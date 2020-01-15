@@ -16,6 +16,7 @@ import com.viroyal.doormagnet.devicemng.entity.Device;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMapper;
+import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;
 import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
@@ -100,6 +101,13 @@ public class DeviceMngController {
     public BaseResponse getDeviceList(@RequestHeader("token") String token) throws TokenInvalidException {
         return mDeviceMng.getDeviceList(token);
     }
+    
+	@GetMapping("v1/{id}/devicestatus")
+	public BaseResponse setDeviceStatus(@RequestHeader("token") String token, @PathVariable("id") String devId)
+			throws TokenInvalidException {
+		return mDeviceMng.getDeviceStatus(token, devId);
+	}
+    
     
     @PutMapping("v1/{id}/settings")
     public BaseResponse setDeviceSettingSwitch(@RequestHeader("token") String token, @PathVariable("id") int devId,
