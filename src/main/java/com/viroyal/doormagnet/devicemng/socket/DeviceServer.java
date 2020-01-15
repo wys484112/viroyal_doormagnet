@@ -78,6 +78,7 @@ public class DeviceServer implements IDeviceServer {
         mByteEncoder = new ByteArrayEncoder();
     }
 
+        
     public static DeviceDefaultChannelGroup ALLCHANNELS_GROUP = new DeviceDefaultChannelGroup("ChannelGroups", GlobalEventExecutor.INSTANCE);
 
     
@@ -186,11 +187,11 @@ public class DeviceServer implements IDeviceServer {
     }
     
     
-	public void sendMsg(String text,Channel channel) throws Exception {
+	public void sendMsg(String textHexStr,Channel channel) throws Exception {
 		// Thread.sleep(2 * 1000);
 		ByteBuf buf = channel.alloc().buffer();
 		Charset charset = Charset.forName("UTF-8");
-		buf.writeCharSequence(text, charset);
+		buf.writeCharSequence(textHexStr, charset);
 		channel.writeAndFlush(buf).addListener(new ChannelFutureListener() {
 
 			@Override
@@ -200,6 +201,11 @@ public class DeviceServer implements IDeviceServer {
 
 			}
 		});
+	}
+	
+	@Override
+	public Channel  getChannelFromImei(String imei) {
+        return ALLCHANNELS_GROUP.getChannelFromImei(imei);
 	}
 	
     /**

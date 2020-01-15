@@ -43,8 +43,7 @@ public class DeviceMngController {
     @Autowired
     private JPushClient mJPushClient;
     
-    @Autowired
-    private IDeviceServer mIDeviceServer;
+
     
     @RequestMapping(value = "/push_test", method = RequestMethod.GET)
     public String pushTest(@RequestParam("user_id") String userId, @RequestParam("alert") String alert) {
@@ -101,6 +100,13 @@ public class DeviceMngController {
     public BaseResponse getDeviceList(@RequestHeader("token") String token) throws TokenInvalidException {
         return mDeviceMng.getDeviceList(token);
     }
+    
+    @PutMapping("v1/{id}/settings")
+    public BaseResponse setDeviceSettingSwitch(@RequestHeader("token") String token, @PathVariable("id") int devId,
+                                       @RequestBody DeviceSetting param) throws TokenInvalidException {
+        return mDeviceMng.setDeviceSetting(token, devId, param);
+    }
+    
 
     @GetMapping("v1/{id}/settings")
     public BaseResponse getDeviceSetting(@RequestHeader("token") String token, @PathVariable("id") int devId) throws TokenInvalidException {
@@ -113,17 +119,9 @@ public class DeviceMngController {
         return mDeviceMng.getDeviceAlert(token, devId, nextId);
     }
 
-    @PutMapping("v1/{id}/settings")
-    public BaseResponse setDeviceSetting(@RequestHeader("token") String token, @PathVariable("id") int devId,
-                                       @RequestBody DeviceSetting param) throws TokenInvalidException {
-        return mDeviceMng.setDeviceSetting(token, devId, param);
-    }
 
-    
-    @GetMapping("v1/listimei")
-    public BaseResponse getDevicessList() {
-        return new DataListResponse(mIDeviceServer.getDeviceActiveList());
-    }
+
+
     
     
 }

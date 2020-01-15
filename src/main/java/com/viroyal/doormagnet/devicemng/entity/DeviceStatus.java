@@ -5,26 +5,56 @@ import org.apache.ibatis.annotations.Mapper;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+
+/*
+ * 
+ * 
+ *
+ * 
+ */
 public class DeviceStatus {
-    public int devId;
-    public int  openStatus;
-    public Timestamp openStatusTime;
-    public int chargeStatus;
-    public Timestamp chargeStatusTime;
-    //告警时间，只有判断为告警才设置
-    public Timestamp alertTime;
-    //已伏为单位的电压值
-    public int voltage;
-    //换算后的电量百分比
-    public int power;
-    //设防状态 1-开启LED和声音 2-只开LED 255-不开
-    public int seurity;
-    //设防开始时间
-    public Time timeStart;
-    //设防结束时间
-    public Time timeEnd;
-    //上传间隔 单位小时
-    public int reportInterval;
-    //报文序号
-    public int lastSequence;
+	// 设备id
+	public String imei;
+	// 电压
+	public int voltage;
+	// 电流
+	public int current;
+	// 有功功率
+	public int activePower;
+	// 无功功率
+	public int reactivePower;
+	// 功率因数
+	public int powerfactor;
+	// 温度
+	public int temperature;
+	// 耗电量整数部分
+	public int powerConsumptionIntegerPart;
+	// 耗电量小数部分
+	public int powerConsumptionDecimalPart;
+	// 控制器1对应灯的亮度
+	public int brightnessControlOne;
+	// 控制器2对应灯的亮度
+	public int brightnessControlTwo;
+	// 控制器3对应灯的亮度
+	public int brightnessControlThree;
+	// 控制器1对应灯的开关
+	public int switchControlOne;
+	// 控制器2对应灯的开关
+	public int switchControlTwo;
+	// 控制器3对应灯的开关
+	public int switchControlThree;
+	// 信号强度的绝对值
+	public int signalStrengthAbsoluteValue;
+	// 调光方式
+	public int dimmingMode;
+	// 异常标志
+	public char abnormalFlag;
+	// 倾斜角度1
+	public int angleOne;
+	// 倾斜角度2
+	public int angleTwo;
+	// 设备初始倾斜角度1
+	public int angleOriginalOne;
+	// 设备初始倾斜角度2
+	public int angleOriginalTwo;
 }

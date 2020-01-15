@@ -32,7 +32,7 @@ public class MessageDispatcher {
      * @param message
      * @param traceId
      */
-    public void dispatch(DeviceMessageBase message, String traceId) {
+    public void dispatch(DeviceMessage message, String traceId) {
         MessageWorker messageWorker = new MessageWorker(message, traceId);
         mMessageExecutor.execute(messageWorker);
     }
@@ -44,10 +44,10 @@ public class MessageDispatcher {
      *
      */
     private final class MessageWorker implements Runnable {
-        private DeviceMessageBase message;
+        private DeviceMessage message;
         private String traceId;
 
-        private MessageWorker(DeviceMessageBase message, String traceId) {
+        private MessageWorker(DeviceMessage message, String traceId) {
             this.message = message;
             this.traceId = traceId;
         }

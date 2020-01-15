@@ -9,6 +9,7 @@ import com.viroyal.doormagnet.devicemng.mapper.DeviceMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceOpLogMapper;
 import com.viroyal.doormagnet.devicemng.pojo.*;
 import com.viroyal.doormagnet.devicemng.service.IDeviceMng;
+import com.viroyal.doormagnet.devicemng.socket.IDeviceServer;
 import com.viroyal.doormagnet.util.ErrorCode;
 import com.viroyal.doormagnet.util.TextUtils;
 import org.slf4j.Logger;
@@ -30,6 +31,9 @@ public class DeviceMngImpl implements IDeviceMng {
 
     @Autowired
     private DeviceOpLogMapper mDeviceOpLogMapper;
+    
+    @Autowired
+    private IDeviceServer mIDeviceServer;
 
     /**
      * 设备绑定
@@ -117,11 +121,11 @@ public class DeviceMngImpl implements IDeviceMng {
      */
     @Override
     public BaseResponse getDeviceList(String token) throws TokenInvalidException {
-        long userId = checkToken(token);
+//        long userId = checkToken(token);
 
-        List<BindListRsp> list = mDeviceMapper.getBindList(userId);
+//        List<BindListRsp> list = mDeviceMapper.getBindList(userId);
 
-        return new DataListResponse(list);
+        return new DataListResponse(mIDeviceServer.getDeviceActiveList());        
     }
 
     /**
@@ -225,4 +229,88 @@ public class DeviceMngImpl implements IDeviceMng {
         }
         return user;
     }
+
+	@Override
+	public BaseResponse setDeviceSettingSwitch(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingBrightness(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingReportInterval(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingStrategy(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingTime(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingReboot(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingCellId(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingSoftVersion(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingHardVersion(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingMountAndAngularThreshold(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingPowerConsumption(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingPowerConsumption(String token, int devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

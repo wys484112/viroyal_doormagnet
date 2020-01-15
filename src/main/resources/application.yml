@@ -46,9 +46,9 @@ spring:
     master_key: abcdefghijkopqrstuvwxyz123456
     datasource:
         driverClassName: com.mysql.jdbc.Driver
-        url: jdbc:mysql://139.196.108.201:55678/db_door_magnet?zeroDateTimeBehavior=convertToNull&autoReconnect=true&tinyInt1isBit=false&useSSL=false
+        url: jdbc:mysql://121.36.240.30:3306/db_door_magnet?zeroDateTimeBehavior=convertToNull&autoReconnect=true&tinyInt1isBit=false&useSSL=false
         username: root
-        password: iyuyun
+        password: viroyal_003
 
 listen_port: 9100
 idle_time: 140
