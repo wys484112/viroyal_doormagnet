@@ -1,6 +1,5 @@
 package com.viroyal.doormagnet.devicemng.service.impl;
 
-import com.sojson.common.dao.UUserMapper;
 import com.viroyal.doormagnet.devicemng.entity.Device;
 import com.viroyal.doormagnet.devicemng.entity.DeviceOpLog;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
