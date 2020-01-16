@@ -15,7 +15,6 @@ import cn.jpush.api.push.model.notification.Notification;
 import com.viroyal.doormagnet.devicemng.entity.Device;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
-import com.viroyal.doormagnet.devicemng.mapper.DeviceMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;

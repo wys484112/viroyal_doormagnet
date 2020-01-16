@@ -5,11 +5,11 @@
 		<jdbcConnection connectionURL="jdbc:mysql://121.36.240.30:3306/db_road_lamp"
 			driverClass="com.mysql.jdbc.Driver" password="viroyal_003" userId="root" />
 		<javaModelGenerator targetPackage="com.viroyal.doormagnet.devicemng.model"
-			targetProject="src/main/resources" />
-		<sqlMapGenerator targetPackage="mapping"
-			targetProject="src/main/resources" />
+			targetProject="src/main/java" />
+		<sqlMapGenerator targetPackage="mapper"
+			targetProject="src/main/resources/mybatis" />
 		<javaClientGenerator targetPackage="com.viroyal.doormagnet.devicemng.mapper"
-			targetProject="src/main/resources" type="XMLMAPPER" />
+			targetProject="src/main/java" type="XMLMAPPER" />
 		<table tableName="t_device_status" domainObjectName="DeviceStatus"
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"

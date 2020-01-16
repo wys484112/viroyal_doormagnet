@@ -20,14 +20,11 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 
-import static org.bouncycastle.jcajce.spec.TLSKeyMaterialSpec.MASTER_SECRET;
-
 @Configuration
 public class DeviceConfig {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private DataSource mDataSource;
+
 
     @Value("${jpush.APP_KEY}")
     private String JPUSH_APP_KEY;
@@ -48,22 +45,7 @@ public class DeviceConfig {
         };
     }
 
-    @Bean
-    public SqlSessionFactoryBean sqlSessionFactory() throws Exception {
-        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-        sessionFactory.setDataSource(mDataSource);
 
-        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
-        configuration.setMapUnderscoreToCamelCase(true);
-        configuration.setLazyLoadingEnabled(true);
-        configuration.setCacheEnabled(false);
-        // 扫描该包下的接口和mapper文件
-        // configuration.addMappers("edu.zju.bme.data.manage.mapper");
-        sessionFactory.setConfiguration(configuration);
-
-        // return sessionFactory.getObject();
-        return sessionFactory;
-    }
 
     @Bean
     public JPushClient createJpushClient() {
