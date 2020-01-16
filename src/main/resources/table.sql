@@ -27,6 +27,18 @@ CREATE TABLE `t_device_status` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE `t_device_switch_setting` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `switchControlOne` int(11) DEFAULT NULL COMMENT '控制器1对应灯的开关',  
+  `switchControlTwo` int(11) DEFAULT NULL COMMENT '控制器2对应灯的开关',  
+  `switchControlThree` int(11) DEFAULT NULL COMMENT '控制器3对应灯的开关',  
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE `t_device` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `imei` char(15) DEFAULT NULL COMMENT '设备id',
@@ -62,5 +74,7 @@ CREATE TABLE `t_region` (
   `road_name` varchar(100) DEFAULT NULL COMMENT '路名称',  
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 
 

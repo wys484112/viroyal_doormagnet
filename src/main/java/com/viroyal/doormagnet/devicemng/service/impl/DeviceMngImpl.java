@@ -7,6 +7,7 @@ import com.viroyal.doormagnet.devicemng.entity.UserEntity;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.DeviceSwitchSetting;
 import com.viroyal.doormagnet.devicemng.pojo.*;
 import com.viroyal.doormagnet.devicemng.service.IDeviceMng;
 import com.viroyal.doormagnet.devicemng.socket.IDeviceServer;
@@ -237,7 +238,7 @@ public class DeviceMngImpl implements IDeviceMng {
     }
 
 	@Override
-	public BaseResponse setDeviceSettingSwitch(String token, String devId, DeviceSetting param)
+	public BaseResponse setDeviceSettingSwitch(String token, String devId, DeviceSwitchSetting param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
 		return null;

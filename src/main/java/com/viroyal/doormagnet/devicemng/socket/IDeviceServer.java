@@ -23,7 +23,7 @@ public interface IDeviceServer {
 	void shutdown();
 	
 	/**
-	 * 获取当前在线的设备
+	 * 获取当前在线的设备的imei
 	 */	
 	List<String> getDeviceActiveList();
 	/**

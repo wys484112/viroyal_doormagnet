@@ -209,7 +209,7 @@ public class DeviceServer implements IDeviceServer {
 	}
 	
     /**
-     * 获取用户名下的在线设备列表
+     * 获取用户名下的在线设备imei列表
      * @param token 用户token
      * @return BaseResponse
      * @throws TokenInvalidException exception

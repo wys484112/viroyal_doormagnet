@@ -3,6 +3,7 @@ package com.viroyal.doormagnet.devicemng.service;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.DeviceSwitchSetting;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,7 @@ public interface IDeviceMng {
     BaseResponse getDeviceList(String token) throws TokenInvalidException;
 
     //设置路灯3路灯的开关
-    BaseResponse setDeviceSettingSwitch(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse setDeviceSettingSwitch(String token, String devId, DeviceSwitchSetting param) throws TokenInvalidException;
 
     //设置路灯3路灯的亮度
     BaseResponse setDeviceSettingBrightness(String token, String devId, DeviceSetting param) throws TokenInvalidException;
