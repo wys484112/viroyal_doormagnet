@@ -56,7 +56,7 @@ public interface IDeviceMng {
     BaseResponse setDeviceStatus(String token, String devId, DeviceStatus param) throws TokenInvalidException;
 
     //获取 设备状态信息
-    BaseResponse getDeviceStatus(String token, String devId) throws TokenInvalidException;
+    BaseResponse getDeviceStatusList(String token, String imei) throws TokenInvalidException;
 
     
     

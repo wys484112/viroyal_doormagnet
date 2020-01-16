@@ -26,3 +26,41 @@ CREATE TABLE `t_device_status` (
   `time` varchar(50) DEFAULT NULL COMMENT '状态上传时间',    
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `t_device` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `region` char(20) DEFAULT NULL COMMENT '设备地区编码',  
+  `time` varchar(50) DEFAULT NULL COMMENT '设备创建时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `t_device_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `brand` varchar(100) DEFAULT NULL COMMENT '设备品牌',  
+  `model` varchar(100) DEFAULT NULL COMMENT '设备型号',
+  `param_desc` varchar(500) DEFAULT NULL COMMENT '设备参数描述',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `t_region` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `continent_id` char(2) DEFAULT NULL COMMENT '洲编码',  
+  `continent_name` varchar(30) DEFAULT NULL COMMENT '洲名称',
+  `country_id` char(3) DEFAULT NULL COMMENT '国家编码',  
+  `country_name` varchar(100) DEFAULT NULL COMMENT '国家名称',  
+  `province_id` char(3) DEFAULT NULL COMMENT '省编码',  
+  `province_name` varchar(100) DEFAULT NULL COMMENT '省名称',  
+  `city_id` char(3) DEFAULT NULL COMMENT '市/县编码',  
+  `city_name` varchar(100) DEFAULT NULL COMMENT '市/县名称',  
+  `town_id` char(3) DEFAULT NULL COMMENT '镇/区编码',  
+  `town_name` varchar(100) DEFAULT NULL COMMENT '镇/区名称',  
+  `village_id` char(3) DEFAULT NULL COMMENT '村编码',  
+  `village_name` varchar(100) DEFAULT NULL COMMENT '村名称',  
+  `road_id` char(3) DEFAULT NULL COMMENT '路编码',  
+  `road_name` varchar(100) DEFAULT NULL COMMENT '路名称',  
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+

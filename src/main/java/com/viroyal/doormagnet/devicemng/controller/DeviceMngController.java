@@ -101,10 +101,10 @@ public class DeviceMngController {
         return mDeviceMng.getDeviceList(token);
     }
     
-	@GetMapping("v1/{id}/devicestatus")
-	public BaseResponse setDeviceStatus(@RequestHeader("token") String token, @PathVariable("id") String devId)
+	@GetMapping("v1/{imei}/devicestatuslist")
+	public BaseResponse getDeviceStatusList(@RequestHeader("token") String token, @PathVariable("imei") String imei)
 			throws TokenInvalidException {
-		return mDeviceMng.getDeviceStatus(token, devId);
+		return mDeviceMng.getDeviceStatusList(token, imei);
 	}
     
     

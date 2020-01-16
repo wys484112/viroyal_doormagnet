@@ -327,12 +327,9 @@ public class DeviceMngImpl implements IDeviceMng {
 	}
 
 	@Override
-	public BaseResponse getDeviceStatus(String token, String devId) throws TokenInvalidException {
-		// TODO Auto-generated method stub
-        ;
-        return new DataListResponse(mDeviceStatusMapper.selectByImei(devId));        
-
-//		return null;
+	public BaseResponse getDeviceStatusList(String token, String imei) throws TokenInvalidException {
+		// TODO Auto-generated method stub      
+        return new DataListResponse(mDeviceStatusMapper.selectByImei(imei));        
 	}
 	
 }
