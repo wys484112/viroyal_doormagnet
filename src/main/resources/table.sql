@@ -23,5 +23,6 @@ CREATE TABLE `t_device_status` (
   `angleTwo` int(11) DEFAULT NULL COMMENT '倾斜角度2',
   `angleOriginalOne` int(11) DEFAULT NULL COMMENT '设备初始倾斜角度1',
   `angleOriginalTwo` int(11) DEFAULT NULL COMMENT '设备初始倾斜角度2',  
+  `time` varchar(50) DEFAULT NULL COMMENT '状态上传时间',    
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
