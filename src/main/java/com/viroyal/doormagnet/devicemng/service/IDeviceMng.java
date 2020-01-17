@@ -15,8 +15,13 @@ public interface IDeviceMng {
 
     BaseResponse unbind(String token, int devId) throws TokenInvalidException;
 
+    //获取所有的设备imei
     BaseResponse getDeviceList(String token) throws TokenInvalidException;
 
+    //获取在线设备
+    BaseResponse getDeviceListActive(String token) throws TokenInvalidException;
+
+    
     //设置路灯3路灯的开关
     BaseResponse setDeviceSettingSwitch(String token, String devId, DeviceSwitchSetting param) throws TokenInvalidException;
 

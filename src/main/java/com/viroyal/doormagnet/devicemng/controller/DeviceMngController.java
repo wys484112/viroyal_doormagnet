@@ -96,12 +96,17 @@ public class DeviceMngController {
         return mDeviceMng.unbind(token, devId);
     }
 
-    @GetMapping("v1/list")
-    public BaseResponse getDeviceList(@RequestHeader("token") String token) throws TokenInvalidException {
+    @GetMapping("v1/listall")
+    public BaseResponse getDeviceListAll(@RequestHeader("token") String token) throws TokenInvalidException {
         return mDeviceMng.getDeviceList(token);
     }
     
-	@GetMapping("v1/{imei}/devicestatuslist")
+    @GetMapping("v1/listactive")
+    public BaseResponse getDeviceListActive(@RequestHeader("token") String token) throws TokenInvalidException {
+        return mDeviceMng.getDeviceList(token);
+    }
+    
+	@GetMapping("v1/{imei}/status")
 	public BaseResponse getDeviceStatusList(@RequestHeader("token") String token, @PathVariable("imei") String imei)
 			throws TokenInvalidException {
 		return mDeviceMng.getDeviceStatusList(token, imei);

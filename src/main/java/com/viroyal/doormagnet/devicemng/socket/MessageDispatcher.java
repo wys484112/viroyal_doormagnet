@@ -1,5 +1,8 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
+import java.util.Date;
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.util.TextUtils;
+
+import io.netty.channel.Channel;
 
 @Service
 public class MessageDispatcher {
@@ -15,21 +21,36 @@ public class MessageDispatcher {
 
 	@Autowired
 	private DeviceStatusMapper mDeviceStatusMapper;
+
 	
 	@Async
-	public void handleMessage(DeviceMessage message) {
-		onDevData(message);
+	public void handleMessage(Channel ch, byte[] msg) {
+		try {
+	        DeviceMessage message = decodeMessage(ch, (byte[]) msg);
+	    	DeviceServer.ALLCHANNELS_GROUP.add(message);            	
+			onDevData(message);
+		} catch (Exception e) {
+			// TODO: handle exception
+            logger.error("error, handleMessage channel=" + ch + ", error=" + e.getMessage());
+		}
+
 	}
 
-	private void onDevData(DeviceMessage message) {
-    	logger.info("dispatch message imei:"+message.getImei()+"   message flag:"+message.getFlagHexStr()+"   message control flag:"+message.getControlHexStr());
-		
+	//6F010001 01  383637373235303330303935353738 0064  03E8 0003E8 0003E8 50 32 03E8 38 04 04 05 00 01 00 64 01 03 04B0 04B0 04B0 04B0 0D0A0D0A
+	
+	private void onDevData(DeviceMessage message) throws Exception {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    	logger.info("dispatch message imei:"+message.getImei()+"   message flag:"+message.getFlagHexStr()+"   message control flag:"+message.getControlHexStr());        
     	switch (message.getFlagHexStr()) {
 		//设备主动上报信息处理
 		case "00":
 			switch (message.getControlHexStr()) {
 			case "01":
-				
+				onDevMessage01(message);
 				break;
 
 			default:
@@ -43,8 +64,8 @@ public class MessageDispatcher {
 			break;
 		}
     }
-	
-	private void onDevMessage01(DeviceMessage message) {
+	//6F01000101002F383637373235303330303935353738006403E80003E80003E8503203E83804040500010064010304B004B004B004B00D0A0D0A	
+	private void onDevMessage01(DeviceMessage message) throws Exception {
 		DeviceStatus status=new DeviceStatus();
 		status.setImei(message.getImei());
 		String contentHexStr=message.getContentHexStr();
@@ -93,11 +114,69 @@ public class MessageDispatcher {
 		status.setAngletwo(Integer.parseInt(angletwo, 16));
 		status.setAngleoriginalone(Integer.parseInt(angleoriginalone, 16));
 		status.setAngleoriginaltwo(Integer.parseInt(angleoriginaltwo, 16));
-		status.setTime("20200117");
+//		Date d=new Date();
+//        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 
-		
-		
+		status.setTime(new Date());
+
+		int index= mDeviceStatusMapper.insertSelective(status);
+    	logger.info("onDevMessage01 insertSelective index:"+index);        
+
+		//判断状态中的电流电源 等数据是否正常，对设备进行回复
+    	onDevMessage01Response(message,true);		
+	}
+	private void onDevMessage01Response(DeviceMessage message,Boolean isRight) throws Exception {
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(message.getChannel());
+		toDeviceMessage.setFlagHexStr("01");
+		toDeviceMessage.setControlHexStr("01");
+		toDeviceMessage.setContentLengthHexStr("0001");
+		toDeviceMessage.setContentHexStr(isRight?"00":"01");
+		DeviceServer.sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
 	}
 
+	
+	
+
+    public DeviceMessage decodeMessage(Channel ch, byte[] msg) {
+    	DeviceMessage base =new DeviceMessage();
+    	String message=new String(msg).trim().toUpperCase(Locale.US);
+        logger.info("decodeMessagerevrevererererre=====:"+message.toString());
+
+    	base.setChannel(ch);
+    	
+    	base.setHeadHexStr(message.substring(0, 4));
+        logger.info("base.getHeadHexStr()=====:"+base.getHeadHexStr());
+    	
+    	base.setFlagHexStr(message.substring(4, 6));
+        logger.info("base.getFlagHexStr()=====:"+base.getFlagHexStr());
+    	
+    	base.setControlHexStr(message.substring(6, 8));
+        logger.info("base.getHeadHexStr()=====:"+base.getControlHexStr());
+    	
+    	base.setVersionHexStr(message.substring(8, 10));
+        logger.info("base.getVersionHexStr()=====:"+base.getVersionHexStr());
+
+    	base.setContentLengthHexStr(message.substring(10, 14));
+        logger.info("base.getContentLengthHexStr()=====:"+base.getContentLengthHexStr());
+
+        Integer dataLength = Integer.valueOf(base.getContentLengthHexStr(),16);
+        logger.info("dataLength=====:"+dataLength);
+
+    	base.setContentHexStr(message.substring(14, dataLength*2+14));
+        logger.info("base.getControlHexStr()=====:"+base.getControlHexStr());
+
+    	base.setEndsHexStr(message.substring(dataLength*2+14, message.length()));
+        logger.info("base.getEndsHexStr()=====:"+base.getEndsHexStr());
+
+    	String imeiHexStr=base.getContentHexStr().substring(0, 30);
+        logger.info("imeiHexStr=====:"+imeiHexStr);
+    	
+    	base.setImei(TextUtils.hexStr2AscIIStr(imeiHexStr));
+
+        logger.info("base.getImei()=====:"+base.getImei());
+
+    	return base;
+    }
 
 }

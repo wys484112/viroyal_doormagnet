@@ -1,4 +1,5 @@
 
+/*设备定时上报状态信息*/
 CREATE TABLE `t_device_status` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `imei` char(15) DEFAULT NULL COMMENT '设备id',
@@ -23,12 +24,109 @@ CREATE TABLE `t_device_status` (
   `angleTwo` int(11) DEFAULT NULL COMMENT '倾斜角度2',
   `angleOriginalOne` int(11) DEFAULT NULL COMMENT '设备初始倾斜角度1',
   `angleOriginalTwo` int(11) DEFAULT NULL COMMENT '设备初始倾斜角度2',  
-  `time` varchar(50) DEFAULT NULL COMMENT '状态上传时间',    
+  `time` datetime DEFAULT NULL COMMENT '状态上传时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备请求读取时间*/
+CREATE TABLE `t_device_read_time` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备上报CELLID*/
+CREATE TABLE `t_device_report_cellid` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `cellid` int(11) DEFAULT NULL COMMENT 'cellid',  
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `t_device_switch_setting` (
+/*设备上报软件版本号*/
+CREATE TABLE `t_device_report_softversion` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `softversion` varchar(500) DEFAULT NULL COMMENT '上报软件版本号',  
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备上报固件版本号*/
+CREATE TABLE `t_device_report_hardversion` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `hardversion` varchar(500) DEFAULT NULL COMMENT '上报固件版本号',  
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备上报开关灯异常报警*/
+CREATE TABLE `t_device_report_lightabnormal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `lightstatus` TINYINT DEFAULT NULL COMMENT '灯开关状态',  
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备上报电流异常报警*/
+CREATE TABLE `t_device_report_currentabnormal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `currentstatus` TINYINT DEFAULT NULL COMMENT '电流状态',  
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*设备上报倾斜器异常报警*/
+CREATE TABLE `t_device_report_angleabnormal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `abnormalflag` TINYINT DEFAULT NULL COMMENT '倾斜器报警标志',  
+  `angleOne` int(11) DEFAULT NULL COMMENT '倾斜角度1',
+  `angleTwo` int(11) DEFAULT NULL COMMENT '倾斜角度2',
+  `angleOriginalOne` int(11) DEFAULT NULL COMMENT '设备初始倾斜角度1',
+  `angleOriginalTwo` int(11) DEFAULT NULL COMMENT '设备初始倾斜角度2',  
+  `angleThreadhold` int(11) DEFAULT NULL COMMENT '角度阈值',      
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备上报耗电量*/
+CREATE TABLE `t_device_report_powerconsumptionabnormal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `powerConsumptionIntegerPart` int(11) DEFAULT NULL COMMENT '耗电量整数部分',
+  `powerConsumptionDecimalPart` int(11) DEFAULT NULL COMMENT '耗电量小数部分', 
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备保持心跳*/
+CREATE TABLE `t_device_report_heartbeat` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设备对服务器的回复*/
+CREATE TABLE `t_device_response_normal` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',     
+  `errorCode` int(11) DEFAULT NULL COMMENT '角度阈值',        
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设置控制器1~3路灯开/关*/
+CREATE TABLE `t_service_settings_device_switch` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `imei` char(15) DEFAULT NULL COMMENT '设备id',
   `switchControlOne` int(11) DEFAULT NULL COMMENT '控制器1对应灯的开关',  
@@ -42,17 +140,11 @@ CREATE TABLE `t_device_switch_setting` (
 CREATE TABLE `t_device` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `imei` char(15) DEFAULT NULL COMMENT '设备id',
-  `region` char(20) DEFAULT NULL COMMENT '设备地区编码',  
-  `time` varchar(50) DEFAULT NULL COMMENT '设备创建时间',    
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `t_device_info` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `region` bigint(20) DEFAULT NULL COMMENT '设备地区编码',  
   `brand` varchar(100) DEFAULT NULL COMMENT '设备品牌',  
   `model` varchar(100) DEFAULT NULL COMMENT '设备型号',
-  `param_desc` varchar(500) DEFAULT NULL COMMENT '设备参数描述',      
+  `param_desc` varchar(500) DEFAULT NULL COMMENT '设备参数描述',        
+  `time` datetime DEFAULT NULL COMMENT '设备创建时间',    
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

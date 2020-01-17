@@ -42,13 +42,12 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
         try {
             MDC.put(RandomUtil.MDC_KEY, RandomUtil.getMDCValue());
             
-            DeviceMessage message = decodeMessage(ctx.channel(), (byte[]) msg);
-            
+            logger.info("channel=" + ctx.channel() + ", msg=" + TextUtils.byte2Str((byte[]) msg));            
+            mDispactcher.handleMessage(ctx.channel(), (byte[]) msg);
+            logger.info("dispatch message");
             {
-            	DeviceServer.ALLCHANNELS_GROUP.add(message);            	
                 logger.info("channels size===="+DeviceServer.ALLCHANNELS_GROUP.size());
             }
-            logger.info("channel=" + ctx.channel() + ", msg=" + TextUtils.byte2Str((byte[]) msg));
 
         } catch (Exception e) {
             logger.error("error, channelRead channel=" + ctx.channel() + ", error=" + e.getMessage());

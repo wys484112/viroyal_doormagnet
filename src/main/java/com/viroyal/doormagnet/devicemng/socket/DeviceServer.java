@@ -187,17 +187,21 @@ public class DeviceServer implements IDeviceServer {
     }
     
     
-	public void sendMsg(String textHexStr,Channel channel) throws Exception {
+	public static void sendMsg(String textHexStr,Channel channel) throws Exception {
 		// Thread.sleep(2 * 1000);
 		ByteBuf buf = channel.alloc().buffer();
 		Charset charset = Charset.forName("UTF-8");
 		buf.writeCharSequence(textHexStr, charset);
 		channel.writeAndFlush(buf).addListener(new ChannelFutureListener() {
-
 			@Override
 			public void operationComplete(ChannelFuture future) throws Exception {
 				// TODO Auto-generated method stub
-				System.out.println("发送成功");
+				if(future.isSuccess()) {
+			    	logger.info("sendMsg 发送成功   channel:"+channel +"  textHexStr:"+textHexStr);        					
+				}else {
+			    	logger.info("sendMsg 发送失败   channel:"+channel +"  textHexStr:"+textHexStr);        
+					
+				}
 
 			}
 		});

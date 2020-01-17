@@ -50,6 +50,8 @@ public class DeviceMessage implements Serializable{
 	public DeviceMessage() {
 		super();
 		// TODO Auto-generated constructor stub
+		this.headHexStr = "6F01";
+		this.endsHexStr = "0D0A0D0A";		
 	}
 
 	public DeviceMessage(Channel channel, String imei, String headHexStr, String flagHexStr, String controlHexStr,

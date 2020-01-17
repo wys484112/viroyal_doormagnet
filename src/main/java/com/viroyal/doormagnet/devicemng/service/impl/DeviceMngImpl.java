@@ -130,6 +130,20 @@ public class DeviceMngImpl implements IDeviceMng {
     }
 
     /**
+     * 获取用户名下的设备列表
+     * @param token 用户token
+     * @return BaseResponse
+     * @throws TokenInvalidException exception
+     */
+    @Override
+    public BaseResponse getDeviceListActive(String token) throws TokenInvalidException {
+//        long userId = checkToken(token);
+
+//        List<BindListRsp> list = mDeviceMapper.getBindList(userId);
+
+        return new DataListResponse(mIDeviceServer.getDeviceActiveList());        
+    }
+    /**
      * 获取设备的设置值
      * @param token 用户token
      * @param devId 设备id
