@@ -15,7 +15,9 @@ import cn.jpush.api.push.model.notification.Notification;
 import com.viroyal.doormagnet.devicemng.entity.Device;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;
 import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
@@ -28,9 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 @RestController
 @RequestMapping("/device/")
@@ -39,6 +43,9 @@ public class DeviceMngController {
 
     @Autowired
     private IDeviceMng mDeviceMng;
+    
+    @Autowired
+    private  ServiceSettingsDeviceSwitchMapper serviceSettingsDeviceSwitchMapper;
 
     @Autowired
     private JPushClient mJPushClient;
@@ -86,6 +93,37 @@ public class DeviceMngController {
         }
     }
 
+    @GetMapping("v1/listactive")
+    public BaseResponse getDeviceListActive(@RequestHeader("token") String token) throws TokenInvalidException {
+        return mDeviceMng.getDeviceList(token);
+    }
+    
+//	@GetMapping("v1/{imei}/status")
+//	public BaseResponse getDeviceStatusList(@RequestHeader("token") String token, @PathVariable("imei") String imei)
+//			throws TokenInvalidException {
+//		return mDeviceMng.getDeviceStatusList(token, imei);
+//	}
+	@GetMapping("v1/{imei}/status")	
+    public Callable<BaseResponse> getDeviceStatusList(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+                return mDeviceMng.getDeviceStatusList(token, imei);
+            }
+        };
+    }
+    
+	
+    @PostMapping("v1/{imei}/switch")
+    public BaseResponse bind(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceSwitch param) throws TokenInvalidException {
+        ServiceSettingsDeviceSwitch switch1=param;
+        switch1.setTime(new Date());
+    	return mDeviceMng.setDeviceSettingSwitch(token, imei, param);
+    }
+    
     @PostMapping("v1/bind")
     public BaseResponse bind(@RequestHeader("token") String token, @RequestBody BindReqParam param) throws TokenInvalidException {
         return mDeviceMng.bind(token, param);
@@ -101,16 +139,7 @@ public class DeviceMngController {
         return mDeviceMng.getDeviceList(token);
     }
     
-    @GetMapping("v1/listactive")
-    public BaseResponse getDeviceListActive(@RequestHeader("token") String token) throws TokenInvalidException {
-        return mDeviceMng.getDeviceList(token);
-    }
-    
-	@GetMapping("v1/{imei}/status")
-	public BaseResponse getDeviceStatusList(@RequestHeader("token") String token, @PathVariable("imei") String imei)
-			throws TokenInvalidException {
-		return mDeviceMng.getDeviceStatusList(token, imei);
-	}
+
     
     
     @PutMapping("v1/{id}/settings")

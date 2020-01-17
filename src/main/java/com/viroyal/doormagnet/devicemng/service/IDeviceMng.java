@@ -3,7 +3,7 @@ package com.viroyal.doormagnet.devicemng.service;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
-import com.viroyal.doormagnet.devicemng.model.DeviceSwitchSetting;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,15 +15,18 @@ public interface IDeviceMng {
 
     BaseResponse unbind(String token, int devId) throws TokenInvalidException;
 
+    
     //获取所有的设备imei
     BaseResponse getDeviceList(String token) throws TokenInvalidException;
 
     //获取在线设备
     BaseResponse getDeviceListActive(String token) throws TokenInvalidException;
 
+    //获取 设备状态信息
+    BaseResponse getDeviceStatusList(String token, String imei) throws TokenInvalidException;
     
     //设置路灯3路灯的开关
-    BaseResponse setDeviceSettingSwitch(String token, String devId, DeviceSwitchSetting param) throws TokenInvalidException;
+    BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param) throws TokenInvalidException;
 
     //设置路灯3路灯的亮度
     BaseResponse setDeviceSettingBrightness(String token, String devId, DeviceSetting param) throws TokenInvalidException;
@@ -61,8 +64,6 @@ public interface IDeviceMng {
     //上传到数据库 设备状态信息
     BaseResponse setDeviceStatus(String token, String devId, DeviceStatus param) throws TokenInvalidException;
 
-    //获取 设备状态信息
-    BaseResponse getDeviceStatusList(String token, String imei) throws TokenInvalidException;
 
     
     

@@ -133,6 +133,7 @@ CREATE TABLE `t_service_settings_device_switch` (
   `switchControlTwo` int(11) DEFAULT NULL COMMENT '控制器2对应灯的开关',  
   `switchControlThree` int(11) DEFAULT NULL COMMENT '控制器3对应灯的开关',  
   `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
