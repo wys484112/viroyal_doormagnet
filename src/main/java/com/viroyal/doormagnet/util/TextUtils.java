@@ -21,7 +21,6 @@ public class TextUtils {
         for (int n = 0; n < iLen; n++) {
             sb.append(mChars[(b[n] & 0xFF) >> 4]);
             sb.append(mChars[b[n] & 0x0F]);
-            sb.append(' ');
         }
         return sb.toString().trim().toUpperCase(Locale.US);
     }

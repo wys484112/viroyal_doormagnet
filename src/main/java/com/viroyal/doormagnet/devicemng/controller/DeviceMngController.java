@@ -116,12 +116,17 @@ public class DeviceMngController {
         };
     }
     
-	
-    @PostMapping("v1/{imei}/switch")
-    public BaseResponse bind(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceSwitch param) throws TokenInvalidException {
-        ServiceSettingsDeviceSwitch switch1=param;
-        switch1.setTime(new Date());
-    	return mDeviceMng.setDeviceSettingSwitch(token, imei, param);
+    @PostMapping("v1/{imei}/switch")	
+    public Callable<BaseResponse> setDeviceSettingSwitch(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceSwitch param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingSwitch(token, imei, param);
+            }
+        };
     }
     
     @PostMapping("v1/bind")

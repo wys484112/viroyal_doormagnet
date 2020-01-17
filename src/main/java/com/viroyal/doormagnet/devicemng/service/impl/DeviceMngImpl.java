@@ -255,7 +255,8 @@ public class DeviceMngImpl implements IDeviceMng {
 	public BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		
+		return mIDeviceServer.setDeviceSettingSwitch(token, devId, param);
 	}
 
 	@Override

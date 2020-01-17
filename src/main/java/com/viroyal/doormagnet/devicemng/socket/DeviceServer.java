@@ -6,6 +6,7 @@ package com.viroyal.doormagnet.devicemng.socket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,10 +19,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindListRsp;
 import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
 import com.viroyal.doormagnet.util.RandomUtil;
+import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -72,6 +76,9 @@ public class DeviceServer implements IDeviceServer {
     @Autowired
     private DeviceHandler mHandler;
 
+    @Autowired
+    private  ServiceSettingsDeviceSwitchMapper serviceSettingsDeviceSwitchMapper;
+    
     private ByteArrayEncoder mByteEncoder;
 
     public DeviceServer() {
@@ -223,5 +230,45 @@ public class DeviceServer implements IDeviceServer {
 
         return ALLCHANNELS_GROUP.getImeisArray();
     }
+
+	@Override
+	public BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param)
+			throws TokenInvalidException {
+		ServiceSettingsDeviceSwitch test=param;
+		test.setTime(new Date());
+		serviceSettingsDeviceSwitchMapper.insertSelective(test);
+		
+		DeviceMessage toDeviceMessage=new DeviceMessage();
+		toDeviceMessage.setChannel(getChannelFromImei(test.getImei()));
+		toDeviceMessage.setFlagHexStr("00");
+		toDeviceMessage.setControlHexStr("11");
+		toDeviceMessage.setContentLengthHexStr("0005");
+		toDeviceMessage.setContentHexStr(ServiceSettingsDeviceSwitchToString(test));	
+		try {
+			sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// TODO Auto-generated method stub
+		return BaseResponse.SUCCESS;
+	}
+	
+	public String   ServiceSettingsDeviceSwitchToString(ServiceSettingsDeviceSwitch test) {
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolone(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getSwitchcontroltwo(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolthree(),1,"0"));
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));		
+		return stringBuffer.toString();
+		
+	}
+	
+	public  String  int2HexStringFormated(int number,int bytenum,String fill) {
+	      String st = Integer.toHexString(number).toUpperCase();
+	      st = String.format("%"+bytenum*2+"s",st);
+	      st= st.replaceAll(" ",fill);
+	      return st;
+	}
     
 }

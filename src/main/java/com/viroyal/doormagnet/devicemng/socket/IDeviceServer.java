@@ -3,6 +3,7 @@ package com.viroyal.doormagnet.devicemng.socket;
 import java.util.List;
 
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 
 import io.netty.channel.Channel;
@@ -30,4 +31,10 @@ public interface IDeviceServer {
 	 * 通过imei获取设备的socket channel，方便与设备通讯
 	 */	
 	Channel  getChannelFromImei(String imei);
+	
+	
+    //设置路灯3路灯的开关
+    BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param) throws TokenInvalidException;
+
+    
 }
