@@ -116,14 +116,28 @@ CREATE TABLE `t_device_report_heartbeat` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*设备对服务器的回复*/
-CREATE TABLE `t_device_response_normal` (
+CREATE TABLE `t_device_response` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `controlHexStr` varchar(10) DEFAULT NULL COMMENT '控制位',  
   `mid` char(2) DEFAULT '11' COMMENT 'Mid',     
-  `errorCode` int(11) DEFAULT NULL COMMENT '角度阈值',        
-  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
+  `errorCode` TINYINT DEFAULT NULL COMMENT 'errorCode',        
+  `time` datetime DEFAULT NULL COMMENT '信息时间',    
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*服务器对设备的回复*/
+CREATE TABLE `t_service_response` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `control` int(11) DEFAULT NULL COMMENT '控制位',  
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',     
+  `errorCode` TINYINT DEFAULT NULL COMMENT 'errorCode',        
+  `time` datetime DEFAULT NULL COMMENT '信息时间',    
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 /*设置控制器1~3路灯开/关*/
 CREATE TABLE `t_service_settings_device_switch` (
@@ -165,6 +179,23 @@ CREATE TABLE `t_region` (
   `village_name` varchar(100) DEFAULT NULL COMMENT '村名称',  
   `road_id` char(3) DEFAULT NULL COMMENT '路编码',  
   `road_name` varchar(100) DEFAULT NULL COMMENT '路名称',  
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+CREATE TABLE `t_message` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT 'imei',
+  `headHexStr` varchar(10) DEFAULT '6F01' COMMENT '报文头',  
+  `flagHexStr` varchar(10) DEFAULT NULL COMMENT '标志位',  
+  `controlHexStr` varchar(10) DEFAULT NULL COMMENT '控制位',  
+  `versionHexStr` varchar(10) DEFAULT NULL COMMENT '版本位',  
+  `contentLengthHexStr` varchar(10) DEFAULT NULL COMMENT '数据区长度',  
+  `contentHexStr` varchar(300) DEFAULT NULL COMMENT '数据区内容',  
+  `endsHexStr` varchar(16) DEFAULT '0D0A0D0A' COMMENT '结束符',  
+  
+  `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

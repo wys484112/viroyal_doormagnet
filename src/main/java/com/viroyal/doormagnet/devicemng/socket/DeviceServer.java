@@ -4,27 +4,25 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
+import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
+import com.viroyal.doormagnet.devicemng.model.DeviceResponse;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
-import com.viroyal.doormagnet.devicemng.pojo.BindListRsp;
-import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
-import com.viroyal.doormagnet.util.RandomUtil;
+import com.viroyal.doormagnet.util.ErrorCode;
 import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -35,13 +33,9 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -78,6 +72,12 @@ public class DeviceServer implements IDeviceServer {
 
     @Autowired
     private  ServiceSettingsDeviceSwitchMapper serviceSettingsDeviceSwitchMapper;
+    
+    @Autowired
+    private DeviceResponseMapper deviceResponseMapper;
+    
+    @Autowired
+    private DeviceMessageMapper deviceMessageMapper;
     
     private ByteArrayEncoder mByteEncoder;
 
@@ -169,8 +169,9 @@ public class DeviceServer implements IDeviceServer {
     /**
      * 通过deviceservice来控制相应的通道
      */
+    @Override   
     @Scheduled(cron = "5/5 * * * * ?")
-    private void sendToDevice() {
+    public void sendToDevice() {
         logger.info("sendToDevice imei:"+"888888888888888");
         Channel channel=ALLCHANNELS_GROUP.getChannelFromImei("888888888888888");
         logger.info("sendToDevic aaaaa");
@@ -240,20 +241,56 @@ public class DeviceServer implements IDeviceServer {
 		
 		DeviceMessage toDeviceMessage=new DeviceMessage();
 		toDeviceMessage.setChannel(getChannelFromImei(test.getImei()));
-		toDeviceMessage.setFlagHexStr("00");
-		toDeviceMessage.setControlHexStr("11");
-		toDeviceMessage.setContentLengthHexStr("0005");
-		toDeviceMessage.setContentHexStr(ServiceSettingsDeviceSwitchToString(test));	
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("11");
+		toDeviceMessage.setContentlengthhexstr("0005");
+		toDeviceMessage.setContenthexstr(ServiceSettingsDeviceSwitchToString(test));
+		return  sendMsg(toDeviceMessage);
+		// TODO Auto-generated method stub
+	}
+	
+	public  BaseResponse sendMsg(DeviceMessage toDeviceMessage)  {
+		toDeviceMessage.setTime(new Date());
 		try {
-			sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
+			sendMsg(toDeviceMessage.getHexStr(), toDeviceMessage.getChannel());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.info("服务器发送信息失败，将信息存入数据库，后续再发送");
+			deviceMessageMapper.insert(toDeviceMessage);
+	        return (new BaseResponse(ErrorCode.SERVICE_SEND_ERROR, "发送信息失败。将信息存入数据库，后续再发送"));			
+		}finally {
+
 		}
-		// TODO Auto-generated method stub
-		return BaseResponse.SUCCESS;
+		try {
+			logger.info("服务器发送信息完毕，等待设备反馈信息");
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		DeviceResponse response = deviceResponseMapper.findLastresponse(toDeviceMessage.getImei(),
+				toDeviceMessage.getControlhexstr());
+		if(response!=null&&response.getTime().after(toDeviceMessage.getTime())) {
+			deviceMessageMapper.deleteByImeiAndControl(toDeviceMessage.getImei(), toDeviceMessage.getControlhexstr());
+	        return BaseResponse.SUCCESS;
+
+		}else if(response==null||response.getTime().before(toDeviceMessage.getTime())){
+			logger.info("服务器发送信息，设备没有回复，将信息存入数据库，后续再发送");
+			deviceMessageMapper.insert(toDeviceMessage);
+			
+	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备没有回复");						
+		}else {
+			logger.info("服务器发送信息，设备反馈信息无效，将信息存入数据库，后续再发送");
+			deviceMessageMapper.insert(toDeviceMessage);
+	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备反馈信息无效");
+
+		}
+			
 	}
-	
 	public String   ServiceSettingsDeviceSwitchToString(ServiceSettingsDeviceSwitch test) {
 		StringBuffer stringBuffer=new StringBuffer();
 		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolone(),1,"0"));

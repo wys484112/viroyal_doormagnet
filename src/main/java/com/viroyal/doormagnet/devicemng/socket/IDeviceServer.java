@@ -2,6 +2,8 @@ package com.viroyal.doormagnet.devicemng.socket;
 
 import java.util.List;
 
+import org.springframework.util.concurrent.ListenableFuture;
+
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
@@ -23,6 +25,7 @@ public interface IDeviceServer {
 	 */
 	void shutdown();
 	
+    void sendToDevice();	
 	/**
 	 * 获取当前在线的设备的imei
 	 */	

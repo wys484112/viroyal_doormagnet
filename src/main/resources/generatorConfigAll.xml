@@ -14,15 +14,28 @@
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>
-		<table tableName="t_device_switch_setting" domainObjectName="DeviceSwitchSetting"
-			enableCountByExample="false" enableUpdateByExample="false"
-			enableDeleteByExample="false" enableSelectByExample="false"
-			selectByExampleQueryId="false"></table>		
+
 			
 		<table tableName="t_service_settings_device_switch" domainObjectName="ServiceSettingsDeviceSwitch"
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>	
+				
+		
+		<table tableName="t_device_response" domainObjectName="DeviceResponse"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+				
+				
+		<table tableName="t_message" domainObjectName="DeviceMessage"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
 					
+		
+			DeviceResponse findLastresponse(@Param("imei")String imei, @Param("control")Integer control);
+		
+		
 	</context> 
 </generatorConfiguration>

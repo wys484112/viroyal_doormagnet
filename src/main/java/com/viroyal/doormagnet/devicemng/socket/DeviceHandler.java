@@ -11,6 +11,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
 import com.viroyal.doormagnet.util.RandomUtil;
 import com.viroyal.doormagnet.util.TextUtils;
 
@@ -104,31 +105,31 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
 
     	base.setChannel(ch);
     	
-    	base.setHeadHexStr(message.substring(0, 4));
-        logger.info("base.getHeadHexStr()=====:"+base.getHeadHexStr());
+    	base.setHeadhexstr(message.substring(0, 4));
+        logger.info("base.getHeadHexStr()=====:"+base.getHeadhexstr());
     	
-    	base.setFlagHexStr(message.substring(4, 6));
-        logger.info("base.getFlagHexStr()=====:"+base.getFlagHexStr());
+    	base.setFlaghexstr(message.substring(4, 6));
+        logger.info("base.getFlagHexStr()=====:"+base.getFlaghexstr());
     	
-    	base.setControlHexStr(message.substring(6, 8));
-        logger.info("base.getHeadHexStr()=====:"+base.getControlHexStr());
+    	base.setControlhexstr(message.substring(6, 8));
+        logger.info("base.getHeadHexStr()=====:"+base.getControlhexstr());
     	
-    	base.setVersionHexStr(message.substring(8, 10));
-        logger.info("base.getVersionHexStr()=====:"+base.getVersionHexStr());
+    	base.setVersionhexstr(message.substring(8, 10));
+        logger.info("base.getVersionHexStr()=====:"+base.getVersionhexstr());
 
-    	base.setContentLengthHexStr(message.substring(10, 14));
-        logger.info("base.getContentLengthHexStr()=====:"+base.getContentLengthHexStr());
+    	base.setContentlengthhexstr(message.substring(10, 14));
+        logger.info("base.getContentLengthHexStr()=====:"+base.getContentlengthhexstr());
 
-        Integer dataLength = Integer.valueOf(base.getContentLengthHexStr(),16);
+        Integer dataLength = Integer.valueOf(base.getContentlengthhexstr(),16);
         logger.info("dataLength=====:"+dataLength);
 
-    	base.setContentHexStr(message.substring(14, dataLength*2+14));
-        logger.info("base.getControlHexStr()=====:"+base.getControlHexStr());
+    	base.setContenthexstr(message.substring(14, dataLength*2+14));
+        logger.info("base.getControlHexStr()=====:"+base.getControlhexstr());
 
-    	base.setEndsHexStr(message.substring(dataLength*2+14, message.length()));
-        logger.info("base.getEndsHexStr()=====:"+base.getEndsHexStr());
+    	base.setEndshexstr(message.substring(dataLength*2+14, message.length()));
+        logger.info("base.getEndsHexStr()=====:"+base.getEndshexstr());
 
-    	String imeiHexStr=base.getContentHexStr().substring(0, 30);
+    	String imeiHexStr=base.getContenthexstr().substring(0, 30);
         logger.info("imeiHexStr=====:"+imeiHexStr);
     	
     	base.setImei(TextUtils.hexStr2AscIIStr(imeiHexStr));

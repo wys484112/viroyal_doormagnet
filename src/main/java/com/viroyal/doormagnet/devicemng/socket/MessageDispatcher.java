@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
+import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
+import com.viroyal.doormagnet.devicemng.model.DeviceResponse;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
 import com.viroyal.doormagnet.util.TextUtils;
 
@@ -22,6 +25,8 @@ public class MessageDispatcher {
 	@Autowired
 	private DeviceStatusMapper mDeviceStatusMapper;
 
+	@Autowired
+	private DeviceResponseMapper deviceresponsemapper;
 	
 	@Async
 	public void handleMessage(Channel ch, byte[] msg) {
@@ -44,11 +49,11 @@ public class MessageDispatcher {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    	logger.info("dispatch message imei:"+message.getImei()+"   message flag:"+message.getFlagHexStr()+"   message control flag:"+message.getControlHexStr());        
-    	switch (message.getFlagHexStr()) {
+    	logger.info("dispatch message imei:"+message.getImei()+"   message flag:"+message.getFlaghexstr()+"   message control flag:"+message.getControlhexstr());        
+    	switch (message.getFlaghexstr()) {
 		//设备主动上报信息处理
 		case "00":
-			switch (message.getControlHexStr()) {
+			switch (message.getControlhexstr()) {
 			case "01":
 				onDevMessage01(message);
 				break;
@@ -59,16 +64,43 @@ public class MessageDispatcher {
 			break;
 		//设备回复信息处理			
 		case "01":
+			switch (message.getControlhexstr()) {
+			case "21":
+				onDevMessage21(message);
+				break;
+
+			default:
+				break;
+			}
+			
 			break;			
 		default:
 			break;
 		}
     }
+	
+	
+	private void onDevMessage21(DeviceMessage message) throws Exception {
+		DeviceResponse response=new DeviceResponse();
+		response.setImei(message.getImei());
+		response.setControlhexstr(message.getControlhexstr());
+		response.setErrorcode((byte) Integer.parseInt(message.getContenthexstr().substring(34, 36), 16));
+		response.setTime(new Date());
+		
+    	logger.info("onDevMessage21   设备回复信息存入数据库insert index:"+response.toString());        
+    	logger.info("onDevMessage21   设备回复信息存入数据库 时间:"+response.getTime().toString());        
+
+    	
+		deviceresponsemapper.insert(response);
+		
+	}
+	
+	
 	//6F01000101002F383637373235303330303935353738006403E80003E80003E8503203E83804040500010064010304B004B004B004B00D0A0D0A	
 	private void onDevMessage01(DeviceMessage message) throws Exception {
 		DeviceStatus status=new DeviceStatus();
 		status.setImei(message.getImei());
-		String contentHexStr=message.getContentHexStr();
+		String contentHexStr=message.getContenthexstr();
 		
 		
 		String voltage=contentHexStr.substring(30, 34);//2
@@ -123,15 +155,15 @@ public class MessageDispatcher {
     	logger.info("onDevMessage01 insertSelective index:"+index);        
 
 		//判断状态中的电流电源 等数据是否正常，对设备进行回复
-    	onDevMessage01Response(message,true);		
+    	onServiceResponse01(message,true);		
 	}
-	private void onDevMessage01Response(DeviceMessage message,Boolean isRight) throws Exception {
+	private void onServiceResponse01(DeviceMessage message,Boolean isRight) throws Exception {
 		DeviceMessage toDeviceMessage = new DeviceMessage();
 		toDeviceMessage.setChannel(message.getChannel());
-		toDeviceMessage.setFlagHexStr("01");
-		toDeviceMessage.setControlHexStr("01");
-		toDeviceMessage.setContentLengthHexStr("0001");
-		toDeviceMessage.setContentHexStr(isRight?"00":"01");
+		toDeviceMessage.setFlaghexstr("01");
+		toDeviceMessage.setControlhexstr("01");
+		toDeviceMessage.setContentlengthhexstr("0001");
+		toDeviceMessage.setContenthexstr(isRight?"00":"01");
 		DeviceServer.sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
 	}
 
@@ -145,31 +177,31 @@ public class MessageDispatcher {
 
     	base.setChannel(ch);
     	
-    	base.setHeadHexStr(message.substring(0, 4));
-        logger.info("base.getHeadHexStr()=====:"+base.getHeadHexStr());
+    	base.setHeadhexstr(message.substring(0, 4));
+        logger.info("base.getHeadHexStr()=====:"+base.getHeadhexstr());
     	
-    	base.setFlagHexStr(message.substring(4, 6));
-        logger.info("base.getFlagHexStr()=====:"+base.getFlagHexStr());
+    	base.setFlaghexstr(message.substring(4, 6));
+        logger.info("base.getFlagHexStr()=====:"+base.getFlaghexstr());
     	
-    	base.setControlHexStr(message.substring(6, 8));
-        logger.info("base.getHeadHexStr()=====:"+base.getControlHexStr());
+    	base.setControlhexstr(message.substring(6, 8));
+        logger.info("base.getHeadHexStr()=====:"+base.getControlhexstr());
     	
-    	base.setVersionHexStr(message.substring(8, 10));
-        logger.info("base.getVersionHexStr()=====:"+base.getVersionHexStr());
+    	base.setVersionhexstr(message.substring(8, 10));
+        logger.info("base.getVersionHexStr()=====:"+base.getVersionhexstr());
 
-    	base.setContentLengthHexStr(message.substring(10, 14));
-        logger.info("base.getContentLengthHexStr()=====:"+base.getContentLengthHexStr());
+    	base.setContentlengthhexstr(message.substring(10, 14));
+        logger.info("base.getContentLengthHexStr()=====:"+base.getContentlengthhexstr());
 
-        Integer dataLength = Integer.valueOf(base.getContentLengthHexStr(),16);
+        Integer dataLength = Integer.valueOf(base.getContentlengthhexstr(),16);
         logger.info("dataLength=====:"+dataLength);
 
-    	base.setContentHexStr(message.substring(14, dataLength*2+14));
-        logger.info("base.getControlHexStr()=====:"+base.getControlHexStr());
+    	base.setContenthexstr(message.substring(14, dataLength*2+14));
+        logger.info("base.getControlHexStr()=====:"+base.getControlhexstr());
 
-    	base.setEndsHexStr(message.substring(dataLength*2+14, message.length()));
-        logger.info("base.getEndsHexStr()=====:"+base.getEndsHexStr());
+    	base.setEndshexstr(message.substring(dataLength*2+14, message.length()));
+        logger.info("base.getEndsHexStr()=====:"+base.getEndshexstr());
 
-    	String imeiHexStr=base.getContentHexStr().substring(0, 30);
+    	String imeiHexStr=base.getContenthexstr().substring(0, 30);
         logger.info("imeiHexStr=====:"+imeiHexStr);
     	
     	base.setImei(TextUtils.hexStr2AscIIStr(imeiHexStr));
