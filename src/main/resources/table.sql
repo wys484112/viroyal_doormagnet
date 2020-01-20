@@ -197,6 +197,7 @@ CREATE TABLE `t_message` (
   
   `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
   PRIMARY KEY (`id`)
+  UNIQUE KEY `imei` (`imei`,`controlHexStr`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

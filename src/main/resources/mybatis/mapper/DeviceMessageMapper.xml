@@ -203,4 +203,25 @@
       time = #{time,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  
+  
+    <insert id="insertOrUpdate" parameterType="com.viroyal.doormagnet.devicemng.model.DeviceMessage">
+    insert into t_message (id, imei, headHexStr, 
+      flagHexStr, controlHexStr, versionHexStr, 
+      contentLengthHexStr, contentHexStr, endsHexStr, 
+      time)
+    values (#{id,jdbcType=BIGINT}, #{imei,jdbcType=CHAR}, #{headhexstr,jdbcType=VARCHAR}, 
+      #{flaghexstr,jdbcType=VARCHAR}, #{controlhexstr,jdbcType=VARCHAR}, #{versionhexstr,jdbcType=VARCHAR}, 
+      #{contentlengthhexstr,jdbcType=VARCHAR}, #{contenthexstr,jdbcType=VARCHAR}, #{endshexstr,jdbcType=VARCHAR}, 
+      #{time,jdbcType=TIMESTAMP})
+     ON DUPLICATE KEY UPDATE 
+      headHexStr = #{headhexstr,jdbcType=VARCHAR},
+      flagHexStr = #{flaghexstr,jdbcType=VARCHAR},
+      versionHexStr = #{versionhexstr,jdbcType=VARCHAR},
+      contentLengthHexStr = #{contentlengthhexstr,jdbcType=VARCHAR},
+      contentHexStr = #{contenthexstr,jdbcType=VARCHAR},
+      endsHexStr = #{endshexstr,jdbcType=VARCHAR},
+      time = #{time,jdbcType=TIMESTAMP}
+ </insert>
+ 
 </mapper>

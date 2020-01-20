@@ -278,9 +278,11 @@ public class DeviceServer implements IDeviceServer {
     
 	public  BaseResponse sendMsgAndReceiveResponse(DeviceMessage toDeviceMessage,String controlhexstr)  {
 		toDeviceMessage.setTime(new Date());
+		logger.info("服务器发送信息");
+
 		if(toDeviceMessage.getChannel()==null) {
 			logger.info("服务器发送信息，设备不在线，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insert(toDeviceMessage);
+			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备不在线，后续发送");
 		}
 		
@@ -291,7 +293,7 @@ public class DeviceServer implements IDeviceServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			logger.info("服务器发送信息失败，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insert(toDeviceMessage);
+			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
 	        return (new BaseResponse(ErrorCode.SERVICE_SEND_ERROR, "发送信息失败。将信息存入数据库，后续再发送"));			
 		}finally {
 
@@ -324,12 +326,12 @@ public class DeviceServer implements IDeviceServer {
 
 		}else if(response==null||response.getTime().before(toDeviceMessage.getTime())){
 			logger.info("服务器发送信息，设备没有回复，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insert(toDeviceMessage);
+			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
 			
 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备没有回复");						
 		}else {
 			logger.info("服务器发送信息，设备反馈信息无效，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insert(toDeviceMessage);
+			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备反馈信息无效");
 		}
 			

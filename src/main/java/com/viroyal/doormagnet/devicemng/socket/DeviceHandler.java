@@ -42,7 +42,7 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         try {
             MDC.put(RandomUtil.MDC_KEY, RandomUtil.getMDCValue());
-            
+			logger.info("channelRead thread=="+Thread.currentThread().getName());            
             logger.info("channel=" + ctx.channel() + ", msg=" + TextUtils.byte2Str((byte[]) msg));            
             mDispactcher.handleMessage(ctx.channel(), (byte[]) msg);
             logger.info("dispatch message");

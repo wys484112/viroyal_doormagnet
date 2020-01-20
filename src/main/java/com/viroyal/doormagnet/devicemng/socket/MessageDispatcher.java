@@ -31,6 +31,8 @@ public class MessageDispatcher {
 	@Async
 	public void handleMessage(Channel ch, byte[] msg) {
 		try {
+			logger.info("handleMessage thread=="+Thread.currentThread().getName());            
+			
 	        DeviceMessage message = decodeMessage(ch, (byte[]) msg);
 	    	DeviceServer.ALLCHANNELS_GROUP.add(message);            	
 			onDevData(message);
