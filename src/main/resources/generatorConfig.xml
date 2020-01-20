@@ -12,7 +12,7 @@
 			targetProject="src/main/java" type="XMLMAPPER" />
 	
 			
-		<table tableName="t_service_response" domainObjectName="ServiceResponse"
+		<table tableName="t_message" domainObjectName="DeviceMessage"
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>	

@@ -5,6 +5,7 @@ package com.viroyal.doormagnet.devicemng.socket;
 
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -172,7 +173,7 @@ public class DeviceServer implements IDeviceServer {
     
     //
     /**
-     * 当设备在线时发送相应的信息设置给设备。
+     * 当设备在线时发送数据库中未发送的信息给设备。
      */
     @Override   
     @Scheduled(cron = "5/5 * * * * ?")
@@ -180,23 +181,17 @@ public class DeviceServer implements IDeviceServer {
         logger.info("sendToDevice imei:"+"888888888888888");
         Channel channel=ALLCHANNELS_GROUP.getChannelFromImei("888888888888888");
         logger.info("sendToDevic aaaaa");
-
-        if(channel!=null) {
-            logger.info("sendToDevice channel:"+channel.toString());
-
-        	try {
-                logger.info("sendToDevice 1111");
-
-				sendMsg("ttttteeeessssttttt",channel);
-                logger.info("sendToDevice 2222");
-
-			} catch (Exception e) {
-                logger.info("sendToDevice 3333");
-
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		logger.info("sendToDevice thread=="+Thread.currentThread().getName());
+		List<DeviceMessage>  messages=deviceMessageMapper.queryByLimit(0, 1000);
+		Iterator<DeviceMessage> iterator=messages.iterator();
+		while (iterator.hasNext()) {
+			DeviceMessage message=iterator.next();
+			if(ALLCHANNELS_GROUP.getChannelFromImei(message.getImei())!=null) {
+				message.setChannel(ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
+				sendMsgAndReceiveResponse(message);
 			}
-        }
+			
+		}
     }
 
     public static void sendMsg(String textHexStr,Channel channel) throws Exception {
@@ -252,9 +247,10 @@ public class DeviceServer implements IDeviceServer {
 		toDeviceMessage.setControlhexstr("11");
 		toDeviceMessage.setContentlengthhexstr("0005");
 		toDeviceMessage.setContenthexstr(ServiceSettingsDeviceSwitchToString(test));
+		toDeviceMessage.setResponsecontrolhexstr("21");
 		logger.info("setDeviceSettingSwitch thread=="+Thread.currentThread().getName());
 		
-		return  sendMsgAndReceiveResponse(toDeviceMessage,"21");
+		return  sendMsgAndReceiveResponse(toDeviceMessage);
 		// TODO Auto-generated method stub
 	}
 	
@@ -276,7 +272,7 @@ public class DeviceServer implements IDeviceServer {
     			controlhexstr));
     }
     
-	public  BaseResponse sendMsgAndReceiveResponse(DeviceMessage toDeviceMessage,String controlhexstr)  {
+	public  BaseResponse sendMsgAndReceiveResponse(DeviceMessage toDeviceMessage)  {
 		toDeviceMessage.setTime(new Date());
 		logger.info("服务器发送信息");
 
@@ -302,7 +298,7 @@ public class DeviceServer implements IDeviceServer {
 
 		DeviceResponse response = null;
 		try {
-			response = getDeviceResponse(5000L,toDeviceMessage.getImei(),controlhexstr).get();
+			response = getDeviceResponse(5000L,toDeviceMessage.getImei(),toDeviceMessage.getResponsecontrolhexstr()).get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -315,11 +311,21 @@ public class DeviceServer implements IDeviceServer {
 		if(response!=null) {
 			logger.info("服务器发送信息完毕，response=="+response.toString());
 			logger.info("服务器发送信息完毕，toDeviceMessage.getTime()=="+toDeviceMessage.getTime());
+			logger.info("服务器发送信息完毕，response.getTime()=="+response.getTime());
+			if(response.getTime().compareTo(toDeviceMessage.getTime())>=0) {
+				logger.info("服务器发送信息完毕，>=");
+
+			}
+			
+		if(response.getTime().compareTo(toDeviceMessage.getTime())<0) {
+			logger.info("服务器发送信息完毕，<");
+
+			}
 		}
 		logger.info("服务器发送信息时间=="+toDeviceMessage.getTime());
 
 
-		if(response!=null&&response.getTime().after(toDeviceMessage.getTime())) {
+		if(response!=null&&response.getTime().compareTo(toDeviceMessage.getTime())>=0) {
 			deviceMessageMapper.deleteByImeiAndControl(toDeviceMessage.getImei(), toDeviceMessage.getControlhexstr());
 			logger.info("设置成功");
 			return BaseResponse.SUCCESS;

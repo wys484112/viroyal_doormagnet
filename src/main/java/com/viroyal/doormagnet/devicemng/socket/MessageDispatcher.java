@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
@@ -28,6 +29,9 @@ public class MessageDispatcher {
 	@Autowired
 	private DeviceResponseMapper deviceresponsemapper;
 	
+	@Autowired
+	private DeviceMessageMapper devicemessagemapper;
+	
 	@Async
 	public void handleMessage(Channel ch, byte[] msg) {
 		try {
@@ -46,11 +50,11 @@ public class MessageDispatcher {
 	//6F010001 01  383637373235303330303935353738 0064  03E8 0003E8 0003E8 50 32 03E8 38 04 04 05 00 01 00 64 01 03 04B0 04B0 04B0 04B0 0D0A0D0A
 	
 	private void onDevData(DeviceMessage message) throws Exception {
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     	logger.info("dispatch message imei:"+message.getImei()+"   message flag:"+message.getFlaghexstr()+"   message control flag:"+message.getControlhexstr());        
     	switch (message.getFlaghexstr()) {
 		//设备主动上报信息处理
@@ -58,6 +62,7 @@ public class MessageDispatcher {
 			switch (message.getControlhexstr()) {
 			case "01":
 				onDevMessage01(message);
+				test(message);
 				break;
 
 			default:
@@ -81,12 +86,26 @@ public class MessageDispatcher {
 		}
     }
 	
-	
+	private void test(DeviceMessage message) {
+		DeviceMessage toDeviceMessage=new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
+		toDeviceMessage.setImei(message.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("11");
+		toDeviceMessage.setContentlengthhexstr("0005");
+		toDeviceMessage.setContenthexstr("0101013131");
+		toDeviceMessage.setResponsecontrolhexstr("21");
+		toDeviceMessage.setTime(new Date());
+		
+		devicemessagemapper.insertOrUpdate(toDeviceMessage);
+	}
 	private void onDevMessage21(DeviceMessage message) throws Exception {
 		DeviceResponse response=new DeviceResponse();
 		response.setImei(message.getImei());
 		response.setControlhexstr(message.getControlhexstr());
 		response.setErrorcode((byte) Integer.parseInt(message.getContenthexstr().substring(34, 36), 16));
+		Thread.sleep(1000);
 		response.setTime(new Date());
 		
     	logger.info("onDevMessage21   设备回复信息存入数据库insert index:"+response.toString());        

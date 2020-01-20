@@ -187,6 +187,7 @@ CREATE TABLE `t_region` (
 CREATE TABLE `t_message` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `imei` char(15) DEFAULT NULL COMMENT 'imei',
+  `responsecontrolHexStr` varchar(10) DEFAULT NULL COMMENT '回复控制位',    
   `headHexStr` varchar(10) DEFAULT '6F01' COMMENT '报文头',  
   `flagHexStr` varchar(10) DEFAULT NULL COMMENT '标志位',  
   `controlHexStr` varchar(10) DEFAULT NULL COMMENT '控制位',  
@@ -196,8 +197,8 @@ CREATE TABLE `t_message` (
   `endsHexStr` varchar(16) DEFAULT '0D0A0D0A' COMMENT '结束符',  
   
   `time` datetime DEFAULT NULL COMMENT '信息获取时间',    
-  PRIMARY KEY (`id`)
-  UNIQUE KEY `imei` (`imei`,`controlHexStr`)  
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `imei`(`imei`,`controlHexStr`)  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
