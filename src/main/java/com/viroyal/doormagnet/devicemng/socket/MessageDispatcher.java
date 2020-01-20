@@ -90,7 +90,10 @@ public class MessageDispatcher {
     	logger.info("onDevMessage21   设备回复信息存入数据库insert index:"+response.toString());        
     	logger.info("onDevMessage21   设备回复信息存入数据库 时间:"+response.getTime().toString());        
 
-    	
+		DeviceResponse response1 = deviceresponsemapper.findLastresponse(response.getImei(),response.getControlhexstr());
+		if(response!=null) {
+			logger.info("服务器发送onDevMessage21完毕，response=="+response.getImei());
+		}
 		deviceresponsemapper.insert(response);
 		
 	}

@@ -6,14 +6,18 @@ package com.viroyal.doormagnet.devicemng.socket;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
@@ -85,6 +89,7 @@ public class DeviceServer implements IDeviceServer {
         mByteEncoder = new ByteArrayEncoder();
     }
 
+    final Object object =new Object();
         
     public static DeviceDefaultChannelGroup ALLCHANNELS_GROUP = new DeviceDefaultChannelGroup("ChannelGroups", GlobalEventExecutor.INSTANCE);
 
@@ -167,7 +172,7 @@ public class DeviceServer implements IDeviceServer {
     
     //
     /**
-     * 通过deviceservice来控制相应的通道
+     * 当设备在线时发送相应的信息设置给设备。
      */
     @Override   
     @Scheduled(cron = "5/5 * * * * ?")
@@ -193,9 +198,8 @@ public class DeviceServer implements IDeviceServer {
 			}
         }
     }
-    
-    
-	public static void sendMsg(String textHexStr,Channel channel) throws Exception {
+
+    public static void sendMsg(String textHexStr,Channel channel) throws Exception {
 		// Thread.sleep(2 * 1000);
 		ByteBuf buf = channel.alloc().buffer();
 		Charset charset = Charset.forName("UTF-8");
@@ -229,6 +233,7 @@ public class DeviceServer implements IDeviceServer {
 	@Override
     public  List<String> getDeviceActiveList() {
 
+		logger.info("getDeviceActiveList thread=="+Thread.currentThread().getName());
         return ALLCHANNELS_GROUP.getImeisArray();
     }
 
@@ -247,12 +252,39 @@ public class DeviceServer implements IDeviceServer {
 		toDeviceMessage.setControlhexstr("11");
 		toDeviceMessage.setContentlengthhexstr("0005");
 		toDeviceMessage.setContenthexstr(ServiceSettingsDeviceSwitchToString(test));
-		return  sendMsg(toDeviceMessage);
+		logger.info("setDeviceSettingSwitch thread=="+Thread.currentThread().getName());
+		
+		return  sendMsgAndReceiveResponse(toDeviceMessage,"21");
 		// TODO Auto-generated method stub
 	}
 	
-	public  BaseResponse sendMsg(DeviceMessage toDeviceMessage)  {
+    @Async
+    public ListenableFuture<DeviceResponse> getDeviceResponse(Long waittime,String imei,String controlhexstr) {
+        
+		synchronized (object) {
+			try {
+				logger.info("等待设备反馈信息 thread=="+Thread.currentThread().getName());
+				object.wait(waittime);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		    	
+    	return new AsyncResult<DeviceResponse>(deviceResponseMapper.findLastresponse(imei,
+    			controlhexstr));
+    }
+    
+	public  BaseResponse sendMsgAndReceiveResponse(DeviceMessage toDeviceMessage,String controlhexstr)  {
 		toDeviceMessage.setTime(new Date());
+		if(toDeviceMessage.getChannel()==null) {
+			logger.info("服务器发送信息，设备不在线，将信息存入数据库，后续再发送");
+			deviceMessageMapper.insert(toDeviceMessage);
+	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备不在线，后续发送");
+		}
+		
+
 		try {
 			sendMsg(toDeviceMessage.getHexStr(), toDeviceMessage.getChannel());
 		} catch (Exception e) {
@@ -264,19 +296,31 @@ public class DeviceServer implements IDeviceServer {
 		}finally {
 
 		}
+
+
+		DeviceResponse response = null;
 		try {
-			logger.info("服务器发送信息完毕，等待设备反馈信息");
-			Thread.sleep(3000);
+			response = getDeviceResponse(5000L,toDeviceMessage.getImei(),controlhexstr).get();
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		DeviceResponse response = deviceResponseMapper.findLastresponse(toDeviceMessage.getImei(),
-				toDeviceMessage.getControlhexstr());
+
+		if(response!=null) {
+			logger.info("服务器发送信息完毕，response=="+response.toString());
+			logger.info("服务器发送信息完毕，toDeviceMessage.getTime()=="+toDeviceMessage.getTime());
+		}
+		logger.info("服务器发送信息时间=="+toDeviceMessage.getTime());
+
+
 		if(response!=null&&response.getTime().after(toDeviceMessage.getTime())) {
 			deviceMessageMapper.deleteByImeiAndControl(toDeviceMessage.getImei(), toDeviceMessage.getControlhexstr());
-	        return BaseResponse.SUCCESS;
+			logger.info("设置成功");
+			return BaseResponse.SUCCESS;
 
 		}else if(response==null||response.getTime().before(toDeviceMessage.getTime())){
 			logger.info("服务器发送信息，设备没有回复，将信息存入数据库，后续再发送");
@@ -287,7 +331,6 @@ public class DeviceServer implements IDeviceServer {
 			logger.info("服务器发送信息，设备反馈信息无效，将信息存入数据库，后续再发送");
 			deviceMessageMapper.insert(toDeviceMessage);
 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备反馈信息无效");
-
 		}
 			
 	}
