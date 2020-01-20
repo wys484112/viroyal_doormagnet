@@ -1,23 +1,37 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
+import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
 
+import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
 import com.viroyal.doormagnet.devicemng.model.DeviceResponse;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
+import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
+import com.viroyal.doormagnet.util.ErrorCode;
 import com.viroyal.doormagnet.util.TextUtils;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 @Service
 public class MessageDispatcher {
@@ -32,6 +46,18 @@ public class MessageDispatcher {
 	@Autowired
 	private DeviceMessageMapper devicemessagemapper;
 	
+    @Autowired
+    private DeviceMessageMapper deviceMessageMapper;
+    
+    @Autowired
+    private DeviceResponseMapper deviceResponseMapper;
+    
+    @Autowired
+    private  ServiceSettingsDeviceSwitchMapper serviceSettingsDeviceSwitchMapper;
+    
+    final Object object =new Object();
+
+    
 	@Async
 	public void handleMessage(Channel ch, byte[] msg) {
 		try {
@@ -188,7 +214,7 @@ public class MessageDispatcher {
 		toDeviceMessage.setControlhexstr("01");
 		toDeviceMessage.setContentlengthhexstr("0001");
 		toDeviceMessage.setContenthexstr(isRight?"00":"01");
-		DeviceServer.sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
+		sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
 	}
 
 	
@@ -235,4 +261,172 @@ public class MessageDispatcher {
     	return base;
     }
 
+    
+    public void sendMsg(String textHexStr,Channel channel) throws Exception {
+		// Thread.sleep(2 * 1000);
+		ByteBuf buf = channel.alloc().buffer();
+		Charset charset = Charset.forName("UTF-8");
+		buf.writeCharSequence(textHexStr, charset);
+		channel.writeAndFlush(buf).addListener(new ChannelFutureListener() {
+			@Override
+			public void operationComplete(ChannelFuture future) throws Exception {
+				// TODO Auto-generated method stub
+				if(future.isSuccess()) {
+			    	logger.info("sendMsg 发送成功   channel:"+channel +"  textHexStr:"+textHexStr);        					
+				}else {
+			    	logger.info("sendMsg 发送失败   channel:"+channel +"  textHexStr:"+textHexStr);        
+					
+				}
+
+			}
+		});
+	}
+ 	public  void messagesScheduledToSend()  {
+		List<DeviceMessage>  messages=deviceMessageMapper.queryByLimit(0, 1000);
+		Iterator<DeviceMessage> iterator=messages.iterator();
+		while (iterator.hasNext()) {
+			DeviceMessage message=iterator.next();
+			if(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei())!=null) {
+				message.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
+				sendMsgAndReceiveResponse(message);
+			}
+			
+		}
+ 	}
+    @Async
+ 	public  BaseResponse sendMsgAndReceiveResponse(DeviceMessage toDeviceMessage)  {
+ 		logger.info("sendMsgAndReceiveResponse sendToDevice thread=="+Thread.currentThread().getName());
+ 		
+ 		toDeviceMessage.setTime(new Date());
+ 		logger.info("服务器发送信息");
+
+ 		if(toDeviceMessage.getChannel()==null) {
+ 			logger.info("服务器发送信息，设备不在线，将信息存入数据库，后续再发送");
+ 			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
+ 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备不在线，后续发送");
+ 		}
+ 		
+
+ 		try {
+ 			sendMsg(toDeviceMessage.getHexStr(), toDeviceMessage.getChannel());
+ 		} catch (Exception e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 			logger.info("服务器发送信息失败，将信息存入数据库，后续再发送");
+ 			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
+ 	        return (new BaseResponse(ErrorCode.SERVICE_SEND_ERROR, "发送信息失败。将信息存入数据库，后续再发送"));			
+ 		}finally {
+
+ 		}
+
+
+ 		DeviceResponse response = null;
+ 		try {
+ 			response = getDeviceResponse(5000L,toDeviceMessage.getImei(),toDeviceMessage.getResponsecontrolhexstr()).get();
+ 		} catch (InterruptedException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		} catch (ExecutionException e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 		
+
+ 		if(response!=null) {
+ 			logger.info("服务器发送信息完毕，response=="+response.toString());
+ 			logger.info("服务器发送信息完毕，toDeviceMessage.getTime()=="+toDeviceMessage.getTime());
+ 			logger.info("服务器发送信息完毕，response.getTime()=="+response.getTime());
+ 			if(response.getTime().compareTo(toDeviceMessage.getTime())>=0) {
+ 				logger.info("服务器发送信息完毕，>=");
+
+ 			}
+ 			
+ 		if(response.getTime().compareTo(toDeviceMessage.getTime())<0) {
+ 			logger.info("服务器发送信息完毕，<");
+
+ 			}
+ 		}
+ 		logger.info("服务器发送信息时间=="+toDeviceMessage.getTime());
+
+
+ 		if(response!=null&&response.getTime().compareTo(toDeviceMessage.getTime())>=0) {
+ 			deviceMessageMapper.deleteByImeiAndControl(toDeviceMessage.getImei(), toDeviceMessage.getControlhexstr());
+ 			logger.info("设置成功");
+ 			return BaseResponse.SUCCESS;
+
+ 		}else if(response==null||response.getTime().before(toDeviceMessage.getTime())){
+ 			logger.info("服务器发送信息，设备没有回复，将信息存入数据库，后续再发送");
+ 			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
+ 			
+ 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备没有回复");						
+ 		}else {
+ 			logger.info("服务器发送信息，设备反馈信息无效，将信息存入数据库，后续再发送");
+ 			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
+ 	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备反馈信息无效");
+ 		}
+ 			
+ 	}
+    
+	public BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param)
+			throws TokenInvalidException {
+		ServiceSettingsDeviceSwitch test=param;
+		test.setTime(new Date());
+		serviceSettingsDeviceSwitchMapper.insertSelective(test);
+		
+		logger.info("setDeviceSettingSwitch getImei=="+test.getImei());
+		
+		DeviceMessage toDeviceMessage=new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="+DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("11");
+		toDeviceMessage.setContentlengthhexstr("0005");
+		toDeviceMessage.setContenthexstr(ServiceSettingsDeviceSwitchToString(test));
+		toDeviceMessage.setResponsecontrolhexstr("21");
+		logger.info("setDeviceSettingSwitch thread=="+Thread.currentThread().getName());
+		
+		return  sendMsgAndReceiveResponse(toDeviceMessage);
+		// TODO Auto-generated method stub
+	}
+	
+	public String   ServiceSettingsDeviceSwitchToString(ServiceSettingsDeviceSwitch test) {
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolone(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getSwitchcontroltwo(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolthree(),1,"0"));
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));		
+		return stringBuffer.toString();
+		
+	}
+	
+	public  String  int2HexStringFormated(int number,int bytenum,String fill) {
+	      String st = Integer.toHexString(number).toUpperCase();
+	      st = String.format("%"+bytenum*2+"s",st);
+	      st= st.replaceAll(" ",fill);
+	      return st;
+	}
+	
+    @Async
+    public ListenableFuture<DeviceResponse> getDeviceResponse(Long waittime,String imei,String controlhexstr) {
+        
+		synchronized (object) {
+			try {
+				logger.info("等待设备反馈信息 thread=="+Thread.currentThread().getName());
+				object.wait(waittime);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		    	
+    	return new AsyncResult<DeviceResponse>(deviceResponseMapper.findLastresponse(imei,
+    			controlhexstr));
+    }
+    
 }

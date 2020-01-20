@@ -76,10 +76,7 @@ public class DeviceServer implements IDeviceServer {
     private DeviceHandler mHandler;
 
     @Autowired
-    private  ServiceSettingsDeviceSwitchMapper serviceSettingsDeviceSwitchMapper;
-    
-    @Autowired
-    private DeviceResponseMapper deviceResponseMapper;
+    private MessageDispatcher messagedispatcher;
     
     @Autowired
     private DeviceMessageMapper deviceMessageMapper;
@@ -90,7 +87,6 @@ public class DeviceServer implements IDeviceServer {
         mByteEncoder = new ByteArrayEncoder();
     }
 
-    final Object object =new Object();
         
     public static DeviceDefaultChannelGroup ALLCHANNELS_GROUP = new DeviceDefaultChannelGroup("ChannelGroups", GlobalEventExecutor.INSTANCE);
 
@@ -178,41 +174,11 @@ public class DeviceServer implements IDeviceServer {
     @Override   
     @Scheduled(cron = "5/5 * * * * ?")
     public void sendToDevice() {
-        logger.info("sendToDevice imei:"+"888888888888888");
-        Channel channel=ALLCHANNELS_GROUP.getChannelFromImei("888888888888888");
-        logger.info("sendToDevic aaaaa");
 		logger.info("sendToDevice thread=="+Thread.currentThread().getName());
-		List<DeviceMessage>  messages=deviceMessageMapper.queryByLimit(0, 1000);
-		Iterator<DeviceMessage> iterator=messages.iterator();
-		while (iterator.hasNext()) {
-			DeviceMessage message=iterator.next();
-			if(ALLCHANNELS_GROUP.getChannelFromImei(message.getImei())!=null) {
-				message.setChannel(ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
-				sendMsgAndReceiveResponse(message);
-			}
-			
-		}
+		messagedispatcher.messagesScheduledToSend();
     }
 
-    public static void sendMsg(String textHexStr,Channel channel) throws Exception {
-		// Thread.sleep(2 * 1000);
-		ByteBuf buf = channel.alloc().buffer();
-		Charset charset = Charset.forName("UTF-8");
-		buf.writeCharSequence(textHexStr, charset);
-		channel.writeAndFlush(buf).addListener(new ChannelFutureListener() {
-			@Override
-			public void operationComplete(ChannelFuture future) throws Exception {
-				// TODO Auto-generated method stub
-				if(future.isSuccess()) {
-			    	logger.info("sendMsg 发送成功   channel:"+channel +"  textHexStr:"+textHexStr);        					
-				}else {
-			    	logger.info("sendMsg 发送失败   channel:"+channel +"  textHexStr:"+textHexStr);        
-					
-				}
 
-			}
-		});
-	}
 	
 	@Override
 	public Channel  getChannelFromImei(String imei) {
@@ -235,128 +201,10 @@ public class DeviceServer implements IDeviceServer {
 	@Override
 	public BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param)
 			throws TokenInvalidException {
-		ServiceSettingsDeviceSwitch test=param;
-		test.setTime(new Date());
-		serviceSettingsDeviceSwitchMapper.insertSelective(test);
-		
-		DeviceMessage toDeviceMessage=new DeviceMessage();
-		toDeviceMessage.setChannel(getChannelFromImei(test.getImei()));
-		toDeviceMessage.setImei(test.getImei());
-		toDeviceMessage.setHeadhexstr("6F01");
-		toDeviceMessage.setFlaghexstr("00");
-		toDeviceMessage.setControlhexstr("11");
-		toDeviceMessage.setContentlengthhexstr("0005");
-		toDeviceMessage.setContenthexstr(ServiceSettingsDeviceSwitchToString(test));
-		toDeviceMessage.setResponsecontrolhexstr("21");
-		logger.info("setDeviceSettingSwitch thread=="+Thread.currentThread().getName());
-		
-		return  sendMsgAndReceiveResponse(toDeviceMessage);
 		// TODO Auto-generated method stub
+		return messagedispatcher.setDeviceSettingSwitch(token, devId, param);
 	}
-	
-    @Async
-    public ListenableFuture<DeviceResponse> getDeviceResponse(Long waittime,String imei,String controlhexstr) {
-        
-		synchronized (object) {
-			try {
-				logger.info("等待设备反馈信息 thread=="+Thread.currentThread().getName());
-				object.wait(waittime);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}
-		    	
-    	return new AsyncResult<DeviceResponse>(deviceResponseMapper.findLastresponse(imei,
-    			controlhexstr));
-    }
-    
-	public  BaseResponse sendMsgAndReceiveResponse(DeviceMessage toDeviceMessage)  {
-		toDeviceMessage.setTime(new Date());
-		logger.info("服务器发送信息");
-
-		if(toDeviceMessage.getChannel()==null) {
-			logger.info("服务器发送信息，设备不在线，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
-	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备不在线，后续发送");
-		}
-		
-
-		try {
-			sendMsg(toDeviceMessage.getHexStr(), toDeviceMessage.getChannel());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			logger.info("服务器发送信息失败，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
-	        return (new BaseResponse(ErrorCode.SERVICE_SEND_ERROR, "发送信息失败。将信息存入数据库，后续再发送"));			
-		}finally {
-
-		}
 
 
-		DeviceResponse response = null;
-		try {
-			response = getDeviceResponse(5000L,toDeviceMessage.getImei(),toDeviceMessage.getResponsecontrolhexstr()).get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-
-		if(response!=null) {
-			logger.info("服务器发送信息完毕，response=="+response.toString());
-			logger.info("服务器发送信息完毕，toDeviceMessage.getTime()=="+toDeviceMessage.getTime());
-			logger.info("服务器发送信息完毕，response.getTime()=="+response.getTime());
-			if(response.getTime().compareTo(toDeviceMessage.getTime())>=0) {
-				logger.info("服务器发送信息完毕，>=");
-
-			}
-			
-		if(response.getTime().compareTo(toDeviceMessage.getTime())<0) {
-			logger.info("服务器发送信息完毕，<");
-
-			}
-		}
-		logger.info("服务器发送信息时间=="+toDeviceMessage.getTime());
-
-
-		if(response!=null&&response.getTime().compareTo(toDeviceMessage.getTime())>=0) {
-			deviceMessageMapper.deleteByImeiAndControl(toDeviceMessage.getImei(), toDeviceMessage.getControlhexstr());
-			logger.info("设置成功");
-			return BaseResponse.SUCCESS;
-
-		}else if(response==null||response.getTime().before(toDeviceMessage.getTime())){
-			logger.info("服务器发送信息，设备没有回复，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
-			
-	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备没有回复");						
-		}else {
-			logger.info("服务器发送信息，设备反馈信息无效，将信息存入数据库，后续再发送");
-			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
-	        return new BaseResponse(ErrorCode.DEVICE_RESPONSE_ERROR, "设备反馈信息无效");
-		}
-			
-	}
-	public String   ServiceSettingsDeviceSwitchToString(ServiceSettingsDeviceSwitch test) {
-		StringBuffer stringBuffer=new StringBuffer();
-		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolone(),1,"0"));
-		stringBuffer.append(int2HexStringFormated(test.getSwitchcontroltwo(),1,"0"));
-		stringBuffer.append(int2HexStringFormated(test.getSwitchcontrolthree(),1,"0"));
-		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));		
-		return stringBuffer.toString();
-		
-	}
-	
-	public  String  int2HexStringFormated(int number,int bytenum,String fill) {
-	      String st = Integer.toHexString(number).toUpperCase();
-	      st = String.format("%"+bytenum*2+"s",st);
-	      st= st.replaceAll(" ",fill);
-	      return st;
-	}
-    
+	    
 }
