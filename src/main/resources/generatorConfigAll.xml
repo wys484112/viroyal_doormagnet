@@ -32,7 +32,12 @@
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>	
-					
+			
+		<table tableName="t_service_response" domainObjectName="ServiceResponse"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+							
 		
 			DeviceResponse findLastresponse(@Param("imei")String imei, @Param("control")Integer control);
 		

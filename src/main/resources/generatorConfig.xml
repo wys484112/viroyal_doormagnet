@@ -11,8 +11,8 @@
 		<javaClientGenerator targetPackage="com.viroyal.doormagnet.devicemng.mapper"
 			targetProject="src/main/java" type="XMLMAPPER" />
 	
-		
-		<table tableName="t_device_response" domainObjectName="DeviceResponse"
+			
+		<table tableName="t_service_response" domainObjectName="ServiceResponse"
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>	
