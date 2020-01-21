@@ -42,7 +42,7 @@
     select 
     <include refid="Base_Column_List" />
     from t_device_response
-    where time= (select max(time) from t_device_response where imei = #{imei,jdbcType=CHAR} and controlHexStr = #{controlhexstr,jdbcType=VARCHAR})
+    where id= (select max(id) from t_device_response where imei = #{imei,jdbcType=CHAR} and controlHexStr = #{controlhexstr,jdbcType=VARCHAR})
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     <!--
