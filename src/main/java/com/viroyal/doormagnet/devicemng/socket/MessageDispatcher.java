@@ -290,7 +290,7 @@ public class MessageDispatcher {
 	public void messagesScheduledToSend() {
 		long aa = System.currentTimeMillis();
 		logger.info("activedevices count=="+DeviceServer.ALLCHANNELS_GROUP.size());
-		List<DeviceMessage> messages = deviceMessageMapper.queryByLimit(0, 1000);
+		List<DeviceMessage> messages = deviceMessageMapper.queryByLimit(0, 10);
 		Iterator<DeviceMessage> iterator = messages.iterator();
 		while (iterator.hasNext()) {
 			DeviceMessage message = iterator.next();

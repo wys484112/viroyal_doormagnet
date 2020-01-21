@@ -86,7 +86,7 @@ public class DeviceHandler extends ChannelInboundHandlerAdapter {
             IdleStateEvent e = (IdleStateEvent) evt;
             if (e.state() == IdleState.READER_IDLE) {
                 logger.info("read_idle channel=" + ctx.channel());
-                ctx.close();
+//                ctx.close();
             }
         } else if (evt instanceof SslHandshakeCompletionEvent) {
             logger.info("ssl handshake done");

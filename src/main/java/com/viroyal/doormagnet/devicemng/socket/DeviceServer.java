@@ -172,7 +172,7 @@ public class DeviceServer implements IDeviceServer {
      * 当设备在线时发送数据库中未发送的信息给设备。每个信息处理需要6秒左右，10分钟处理100个以下。
      */
     @Override   
-    @Scheduled(cron = "0/4 * * * * ?")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void sendToDevice() {
 		logger.info("sendToDevice thread=="+Thread.currentThread().getName());
 		messagedispatcher.messagesScheduledToSend();  
