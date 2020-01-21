@@ -1,11 +1,13 @@
 package com.viroyal.doormagnet.devicemng.socket;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -290,17 +292,35 @@ public class MessageDispatcher {
 	public void messagesScheduledToSend() {
 		long aa = System.currentTimeMillis();
 		logger.info("activedevices count=="+DeviceServer.ALLCHANNELS_GROUP.size());
-		List<DeviceMessage> messages = deviceMessageMapper.queryByLimit(0, 10);
-		Iterator<DeviceMessage> iterator = messages.iterator();
-		while (iterator.hasNext()) {
-			DeviceMessage message = iterator.next();
-			if (DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()) != null) {
-				message.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
-				message.setTime(new Date());
-				sendMsgAndReceiveResponse(message);
+		List<String> activeimeis=DeviceServer.ALLCHANNELS_GROUP.getImeisArray();
+		Iterator<String> iteratorImeis = activeimeis.iterator();
+		
+		List<DeviceMessage> messages= new ArrayList<DeviceMessage>();
+		while (iteratorImeis.hasNext()) {
+			String imei = iteratorImeis.next();
+			messages.addAll(deviceMessageMapper.selectByImei(imei));
+			if(messages.size()>5) {
+				break;
 			}
-
 		}
+		messages.forEach(message -> {
+			message.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
+			message.setTime(new Date());
+			sendMsgAndReceiveResponse(message);
+		});
+		
+//		
+//		List<DeviceMessage> messages = deviceMessageMapper.queryByLimit(0, 10);
+//		Iterator<DeviceMessage> iterator = messages.iterator();
+//		while (iterator.hasNext()) {
+//			DeviceMessage message = iterator.next();
+//			if (DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()) != null) {
+//				message.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
+//				message.setTime(new Date());
+//				sendMsgAndReceiveResponse(message);
+//			}
+//
+//		}
 		logger.info("thread==" + Thread.currentThread().getName() + "  时间："
 				+ (System.currentTimeMillis() - aa));
 
@@ -333,7 +353,7 @@ public class MessageDispatcher {
 		if (response != null && response.getTime().compareTo(toDeviceMessage.getTime()) >= 0) {
 			deviceMessageMapper.deleteByImeiAndControl(toDeviceMessage.getImei(),
 					toDeviceMessage.getControlhexstr());
-			logger.info("设置成功 发送接受信息时间：" + (System.currentTimeMillis() - aa));
+			logger.info("设置成功 发送接受信息时间：" + (System.currentTimeMillis() - aa)+"   当前时间"+System.currentTimeMillis());
 
 			return BaseResponse.SUCCESS;
 
