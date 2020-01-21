@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import com.mysql.cj.Constants;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
@@ -28,6 +29,7 @@ import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.util.ErrorCode;
+import com.viroyal.doormagnet.util.MyConstant;
 import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.buffer.ByteBuf;
@@ -98,10 +100,11 @@ public class MessageDispatcher {
 		case "01":
 			switch (message.getControlhexstr()) {
 			case "21":
-				onDevMessage21(message);
+				onDevMessageResponse(message);
 				break;
 
 			default:
+				onDevMessageResponse(message);				
 				break;
 			}
 			
@@ -126,7 +129,7 @@ public class MessageDispatcher {
 		deviceMessageMapper.insertOrUpdate(toDeviceMessage);
 	}
 
-	private void onDevMessage21(DeviceMessage message) throws Exception {
+	private void onDevMessageResponse(DeviceMessage message) throws Exception {
 		DeviceResponse response = new DeviceResponse();
 		response.setImei(message.getImei());
 		response.setControlhexstr(message.getControlhexstr());
@@ -136,9 +139,9 @@ public class MessageDispatcher {
 
 		
 		deviceresponsemapper.insert(response);
-		logger.info("onDevMessage21，response==" + response.getImei());
-		int aa=deviceMessageMapper.deleteByImeiAndControl(message.getImei(), "11");
-		logger.info("onDevMessage21，deleteByImeiAndControl aa==" + aa);
+		logger.info("onDevMessageResponse，response imei==" + response.getImei()+"  control"+message.getControlhexstr());
+		int aa=deviceMessageMapper.deleteByImeiAndControl(message.getImei(), MyConstant.controlResponseControlHEXMap.get(message.getControlhexstr()));
+		logger.info("onDevMessageResponse，deleteByImeiAndControl aa==" + aa);
 
 
 	}
