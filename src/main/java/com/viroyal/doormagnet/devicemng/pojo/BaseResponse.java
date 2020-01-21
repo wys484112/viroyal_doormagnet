@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.viroyal.doormagnet.util.ErrorCode;
+import com.viroyal.doormagnet.util.MYException;
 
 /**
  * 通用响应封装
@@ -35,6 +36,13 @@ public class BaseResponse {
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
+    
+	public BaseResponse(String errorMsg) {
+		this.errorCode = MYException.exceptions.containsKey(errorMsg) ? MYException.exceptions.get(errorMsg)
+				: ErrorCode.INVALID_PARAM;
+		this.errorMsg = errorMsg;
+	}
+    
 
     public static BaseResponse getInvalidParamResponse(String errorMsg) {
         return new BaseResponse(ErrorCode.INVALID_PARAM, errorMsg);

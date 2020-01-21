@@ -169,13 +169,13 @@ public class DeviceServer implements IDeviceServer {
     
     //
     /**
-     * 当设备在线时发送数据库中未发送的信息给设备。
+     * 当设备在线时发送数据库中未发送的信息给设备。每个信息处理需要6秒左右，10分钟处理100个以下。
      */
     @Override   
-    @Scheduled(cron = "5/5 * * * * ?")
+    @Scheduled(cron = "0/4 * * * * ?")
     public void sendToDevice() {
 		logger.info("sendToDevice thread=="+Thread.currentThread().getName());
-		messagedispatcher.messagesScheduledToSend();
+		messagedispatcher.messagesScheduledToSend();  
     }
 
 
@@ -202,6 +202,7 @@ public class DeviceServer implements IDeviceServer {
 	public BaseResponse setDeviceSettingSwitch(String token, String devId, ServiceSettingsDeviceSwitch param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
+
 		return messagedispatcher.setDeviceSettingSwitch(token, devId, param);
 	}
 
