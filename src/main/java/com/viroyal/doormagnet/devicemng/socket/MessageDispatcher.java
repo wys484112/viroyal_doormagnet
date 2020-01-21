@@ -137,9 +137,9 @@ public class MessageDispatcher {
 		
 		deviceresponsemapper.insert(response);
 		logger.info("onDevMessage21，response==" + response.getImei());
-		deviceMessageMapper.deleteByImeiAndControl(message.getImei(), message.getControlhexstr());
+		int aa=deviceMessageMapper.deleteByImeiAndControl(message.getImei(), "11");
+		logger.info("onDevMessage21，deleteByImeiAndControl aa==" + aa);
 
-		
 
 	}
 	
