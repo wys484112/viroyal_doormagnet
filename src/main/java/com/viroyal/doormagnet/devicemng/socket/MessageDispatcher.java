@@ -45,9 +45,6 @@ public class MessageDispatcher {
 	@Autowired
 	private DeviceResponseMapper deviceresponsemapper;
 	
-	@Autowired
-	private DeviceMessageMapper devicemessagemapper;
-	
     @Autowired
     private DeviceMessageMapper deviceMessageMapper;
     
@@ -126,7 +123,7 @@ public class MessageDispatcher {
 		toDeviceMessage.setResponsecontrolhexstr("21");
 		toDeviceMessage.setTime(new Date());
 		
-		devicemessagemapper.insertOrUpdate(toDeviceMessage);
+		deviceMessageMapper.insertOrUpdate(toDeviceMessage);
 	}
 
 	private void onDevMessage21(DeviceMessage message) throws Exception {
@@ -137,8 +134,12 @@ public class MessageDispatcher {
 		Thread.sleep(1000);
 		response.setTime(new Date());
 
+		
 		deviceresponsemapper.insert(response);
-		logger.info("服务器发送onDevMessage21完毕，response==" + response.getImei());
+		logger.info("onDevMessage21，response==" + response.getImei());
+		deviceMessageMapper.deleteByImeiAndControl(message.getImei(), message.getControlhexstr());
+
+		
 
 	}
 	
@@ -279,7 +280,9 @@ public class MessageDispatcher {
 		});
 	}
     
+    @Async    
     public void sendMsg(DeviceMessage toDeviceMessage) throws Exception{
+		logger.info("sendToDevice thread==" + Thread.currentThread().getName());    	    	
  		if(toDeviceMessage.getChannel()==null) {
  			logger.info("服务器发送信息，设备不在线，将信息存入数据库，后续再发送");
  			deviceMessageMapper.insertOrUpdate(toDeviceMessage);
@@ -306,7 +309,13 @@ public class MessageDispatcher {
 		messages.forEach(message -> {
 			message.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(message.getImei()));
 			message.setTime(new Date());
-			sendMsgAndReceiveResponse(message);
+			try {
+				sendMsg(message);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		});
 		
 //		
@@ -321,7 +330,7 @@ public class MessageDispatcher {
 //			}
 //
 //		}
-		logger.info("thread==" + Thread.currentThread().getName() + "  时间："
+		logger.info("sendToDevice thread==" + Thread.currentThread().getName() + "  时间："
 				+ (System.currentTimeMillis() - aa));
 
 	}
