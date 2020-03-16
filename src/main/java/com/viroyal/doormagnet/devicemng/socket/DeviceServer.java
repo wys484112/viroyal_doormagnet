@@ -17,6 +17,7 @@ import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceBrightness;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceInstallationstateAnglethreadhold;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceLightingStrategy;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDevicePowerConsumption;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceReportInterval;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
@@ -199,28 +200,28 @@ public class DeviceServer implements IDeviceServer {
 	public BaseResponse setDeviceSettingBrightness(String token, String devId, ServiceSettingsDeviceBrightness param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingBrightness(token, devId, param);
 	}
 
 	@Override
 	public BaseResponse setDeviceSettingReportInterval(String token, String devId, ServiceSettingsDeviceReportInterval param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingReportInterval(token, devId, param);
 	}
 
 	@Override
 	public BaseResponse setDeviceSettingStrategy(String token, String devId, ServiceSettingsDeviceLightingStrategy param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingStrategy(token, devId, param);
 	}
 
 	@Override
 	public BaseResponse setDeviceSettingTime(String token, String devId, ServiceSettingsDeviceTime param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingTime(token, devId, param);
 	}
 
 	@Override
@@ -255,7 +256,7 @@ public class DeviceServer implements IDeviceServer {
 	public BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId, ServiceSettingsDeviceInstallationstateAnglethreadhold param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingInstallationstateAnglethreadhold(token, devId, param);
 	}
 
 	@Override
@@ -266,10 +267,10 @@ public class DeviceServer implements IDeviceServer {
 	}
 
 	@Override
-	public BaseResponse setDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param)
+	public BaseResponse setDeviceSettingPowerConsumption(String token, String devId, ServiceSettingsDevicePowerConsumption param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingPowerConsumption(token, devId, param);
 	}
 
 	@Override

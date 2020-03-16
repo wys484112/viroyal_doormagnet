@@ -269,28 +269,28 @@ public class DeviceMngImpl implements IDeviceMng {
 	public BaseResponse setDeviceSettingBrightness(String token, String devId, ServiceSettingsDeviceBrightness param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingBrightness(token, devId, param);
 	}
 
 	@Override
 	public BaseResponse setDeviceSettingReportInterval(String token, String devId, ServiceSettingsDeviceReportInterval param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingReportInterval(token, devId, param);
 	}
 
 	@Override
 	public BaseResponse setDeviceSettingStrategy(String token, String devId, ServiceSettingsDeviceLightingStrategy param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingStrategy(token, devId, param);
 	}
 
 	@Override
 	public BaseResponse setDeviceSettingTime(String token, String devId, ServiceSettingsDeviceTime param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingTime(token, devId, param);
 	}
 
 	@Override
@@ -325,7 +325,7 @@ public class DeviceMngImpl implements IDeviceMng {
 	public BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId, ServiceSettingsDeviceInstallationstateAnglethreadhold param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingInstallationstateAnglethreadhold(token, devId, param);
 	}
 
 	@Override
@@ -339,7 +339,7 @@ public class DeviceMngImpl implements IDeviceMng {
 	public BaseResponse setDeviceSettingPowerConsumption(String token, String devId, ServiceSettingsDevicePowerConsumption param)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingPowerConsumption(token, devId, param);
 	}
 
 	@Override

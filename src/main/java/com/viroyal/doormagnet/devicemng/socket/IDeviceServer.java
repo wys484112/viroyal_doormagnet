@@ -10,6 +10,7 @@ import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceBrightness;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceInstallationstateAnglethreadhold;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceLightingStrategy;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDevicePowerConsumption;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceReportInterval;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
@@ -77,7 +78,7 @@ public interface IDeviceServer {
     BaseResponse getDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param) throws TokenInvalidException;
 
     //设置耗电量
-    BaseResponse setDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse setDeviceSettingPowerConsumption(String token, String devId, ServiceSettingsDevicePowerConsumption param) throws TokenInvalidException;
     
     //上传到数据库 设备状态信息
     BaseResponse saveDeviceStatus(String token, String devId, DeviceStatus param) throws TokenInvalidException;

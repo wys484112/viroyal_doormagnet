@@ -18,15 +18,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import com.mysql.cj.Constants;
+import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceBrightnessMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceInstallationstateAnglethreadholdMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceLightingStrategyMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDevicePowerConsumptionMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceReportIntervalMapper;
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
+import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceTimeMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
 import com.viroyal.doormagnet.devicemng.model.DeviceResponse;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceBrightness;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceInstallationstateAnglethreadhold;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceLightingStrategy;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDevicePowerConsumption;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceReportInterval;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.util.ErrorCode;
 import com.viroyal.doormagnet.util.MyConstant;
@@ -55,7 +68,24 @@ public class MessageDispatcher {
     
     @Autowired
     private  ServiceSettingsDeviceSwitchMapper serviceSettingsDeviceSwitchMapper;
+        
+    @Autowired
+    private ServiceSettingsDeviceBrightnessMapper serviceSettingsDeviceBrightnessMapper;
     
+    @Autowired
+    private ServiceSettingsDeviceReportIntervalMapper serviceSettingsDeviceReportIntervalMapper;
+    
+    @Autowired
+    private ServiceSettingsDeviceLightingStrategyMapper serviceSettingsDeviceLightingStrategyMapper;
+    
+    @Autowired
+    private ServiceSettingsDeviceTimeMapper serviceSettingsDeviceTimeMapper;
+    
+    @Autowired
+    private ServiceSettingsDeviceInstallationstateAnglethreadholdMapper serviceSettingsDeviceInstallationstateAnglethreadholdMapper;
+    
+    @Autowired
+    private ServiceSettingsDevicePowerConsumptionMapper serviceSettingsDevicePowerConsumptionMapper;
     final Object object =new Object();
 
     
@@ -421,6 +451,15 @@ public class MessageDispatcher {
 		
 	}
 	
+	public String   ServiceSettingsDeviceBrightnessToString(ServiceSettingsDeviceBrightness test) {
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getBrightnesscontrolone(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getBrightnesscontroltwo(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getBrightnesscontrolthree(),1,"0"));
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));		
+		return stringBuffer.toString();
+		
+	}	
 	public  String  int2HexStringFormated(int number,int bytenum,String fill) {
 	      String st = Integer.toHexString(number).toUpperCase();
 	      st = String.format("%"+bytenum*2+"s",st);
@@ -442,6 +481,231 @@ public class MessageDispatcher {
 		}
 
 		return null;
+	}
+
+	public BaseResponse setDeviceSettingBrightness(String token, String devId, ServiceSettingsDeviceBrightness param) {
+		// TODO Auto-generated method stub
+		ServiceSettingsDeviceBrightness test = param;
+		test.setTime(new Date());
+		serviceSettingsDeviceBrightnessMapper.insertSelective(test);
+
+		logger.info("setDeviceSettingSwitch getImei==" + test.getImei());
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("12");
+		toDeviceMessage.setContentlengthhexstr("0005");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getBrightnesscontrolone(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getBrightnesscontroltwo(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getBrightnesscontrolthree(),1,"0"));
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse setDeviceSettingReportInterval(String token, String devId,
+			ServiceSettingsDeviceReportInterval param) {
+		// TODO Auto-generated method stub
+		ServiceSettingsDeviceReportInterval test = param;
+		test.setTime(new Date());
+		serviceSettingsDeviceReportIntervalMapper.insertSelective(test);
+
+		logger.info("setDeviceSettingSwitch getImei==" + test.getImei());
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("13");
+		toDeviceMessage.setContentlengthhexstr("0004");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getReportinterval(),2,"0"));
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse setDeviceSettingStrategy(String token, String devId,
+			ServiceSettingsDeviceLightingStrategy param) {
+		// TODO Auto-generated method stub
+		ServiceSettingsDeviceLightingStrategy test = param;
+		test.setTime(new Date());
+		serviceSettingsDeviceLightingStrategyMapper.insertSelective(test);
+
+		logger.info("setDeviceSettingSwitch getImei==" + test.getImei());
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("14");
+		toDeviceMessage.setContentlengthhexstr(int2HexStringFormated(test.getTimenum()*5+5+2,2,"0"));
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getLightnum(),1,"0"));				
+		stringBuffer.append(int2HexStringFormated(test.getStrategynum(),2,"0"));				
+		stringBuffer.append(int2HexStringFormated(test.getStrategyperiod(),1,"0"));				
+		stringBuffer.append(int2HexStringFormated(test.getTimenum(),1,"0"));				
+
+		stringBuffer.append(test.getTimehex());
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse setDeviceSettingTime(String token, String devId, ServiceSettingsDeviceTime param) {
+		// TODO Auto-generated method stub
+		ServiceSettingsDeviceTime test = param;
+		test.setTime(new Date());
+		serviceSettingsDeviceTimeMapper.insertSelective(test);
+
+		logger.info("setDeviceSettingSwitch getImei==" + test.getImei());
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("15");
+		toDeviceMessage.setContentlengthhexstr("0009");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getYear(),2,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getMonth(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getDay(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getHour(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getMinute(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getSecond(),1,"0"));
+
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId,
+			ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
+		// TODO Auto-generated method stub
+		ServiceSettingsDeviceInstallationstateAnglethreadhold test = param;
+		test.setTime(new Date());
+		serviceSettingsDeviceInstallationstateAnglethreadholdMapper.insertSelective(test);
+
+		logger.info("setDeviceSettingSwitch getImei==" + test.getImei());
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("1a");
+		toDeviceMessage.setContentlengthhexstr("0005");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getInstallationstable(),1,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getAnglethreadhold()*10,2,"0"));
+
+
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse setDeviceSettingPowerConsumption(String token, String devId, ServiceSettingsDevicePowerConsumption param) {
+		// TODO Auto-generated method stub
+		ServiceSettingsDevicePowerConsumption test = param;
+		test.setTime(new Date());
+		serviceSettingsDevicePowerConsumptionMapper.insertSelective(test);
+
+		logger.info("setDeviceSettingSwitch getImei==" + test.getImei());
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(test.getImei()));
+
+		toDeviceMessage.setImei(test.getImei());
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("1c");
+		toDeviceMessage.setContentlengthhexstr("0005");
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(int2HexStringFormated(test.getPowerconsumptionintegerpart(),2,"0"));
+		stringBuffer.append(int2HexStringFormated(test.getPowerconsumptiondecimalpart(),1,"0"));
+
+
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
 	}
     
 }
