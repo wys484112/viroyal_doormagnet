@@ -17,7 +17,13 @@ import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
 import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceBrightness;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceInstallationstateAnglethreadhold;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceLightingStrategy;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDevicePowerConsumption;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceReportInterval;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.devicemng.pojo.BindReqParam;
 import com.viroyal.doormagnet.devicemng.pojo.DataListResponse;
@@ -128,6 +134,85 @@ public class DeviceMngController {
             }
         };
     }
+    
+    @PostMapping("v1/{imei}/brightness")	
+    public Callable<BaseResponse> setDeviceSettingBrightness(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceBrightness param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingBrightness(token, imei, param);
+            }
+        };
+    }
+   
+    @PostMapping("v1/{imei}/reportinterval")	
+    public Callable<BaseResponse> setDeviceSettingReportInterval(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceReportInterval param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingReportInterval(token, imei, param);
+            }
+        };
+    }
+    
+    @PostMapping("v1/{imei}/lightingstrategy")	
+    public Callable<BaseResponse> setDeviceSettingStrategy(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceLightingStrategy param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingStrategy(token, imei, param);
+            }
+        };
+    }
+    
+    @PostMapping("v1/{imei}/time")	
+    public Callable<BaseResponse> setDeviceSettingTime(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceTime param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingTime(token, imei, param);
+            }
+        };
+    }
+    
+    @PostMapping("v1/{imei}/installationstateanglethreadhold")	
+    public Callable<BaseResponse> setDeviceSettingInstallationstateAnglethreadhold(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingInstallationstateAnglethreadhold(token, imei, param);
+            }
+        };
+    }
+
+    @PostMapping("v1/{imei}/powerconsumption")	
+    public Callable<BaseResponse> setDeviceSettingPowerConsumption(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDevicePowerConsumption param) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingPowerConsumption(token, imei, param);
+            }
+        };
+    }
+    
     
     @PostMapping("v1/bind")
     public BaseResponse bind(@RequestHeader("token") String token, @RequestBody BindReqParam param) throws TokenInvalidException {

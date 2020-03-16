@@ -6,6 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+/*
+ * 控制器1~3路灯开/关
+ */
 public class ServiceSettingsDeviceSwitch {
     /**
      *

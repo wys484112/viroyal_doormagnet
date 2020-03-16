@@ -3,38 +3,27 @@
  */
 package com.viroyal.doormagnet.devicemng.socket;
 
-import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-
+import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
-import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
-import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
-import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
-import com.viroyal.doormagnet.devicemng.model.DeviceResponse;
+import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceBrightness;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceInstallationstateAnglethreadhold;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceLightingStrategy;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceReportInterval;
 import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
+import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
-import com.viroyal.doormagnet.util.ErrorCode;
-import com.viroyal.doormagnet.util.TextUtils;
-
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -204,6 +193,89 @@ public class DeviceServer implements IDeviceServer {
 		// TODO Auto-generated method stub
 
 		return messagedispatcher.setDeviceSettingSwitch(token, devId, param);
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingBrightness(String token, String devId, ServiceSettingsDeviceBrightness param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingReportInterval(String token, String devId, ServiceSettingsDeviceReportInterval param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingStrategy(String token, String devId, ServiceSettingsDeviceLightingStrategy param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingTime(String token, String devId, ServiceSettingsDeviceTime param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingReboot(String token, String devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingCellId(String token, String devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingSoftVersion(String token, String devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingHardVersion(String token, String devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId, ServiceSettingsDeviceInstallationstateAnglethreadhold param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse getDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse setDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param)
+			throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BaseResponse saveDeviceStatus(String token, String devId, DeviceStatus param) throws TokenInvalidException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -305,7 +305,7 @@ public class MessageDispatcher {
 		while (iteratorImeis.hasNext()) {
 			String imei = iteratorImeis.next();
 			messages.addAll(deviceMessageMapper.selectByImei(imei));
-			if(messages.size()>1000) {
+			if(messages.size()>500) {
 				break;
 			}
 		}

@@ -4,6 +4,13 @@ import java.util.Date;
 
 import io.netty.channel.Channel;
 
+
+/**
+*
+* 发送给设备的信息 ，接收到设备的信息
+*
+* @mbg.generated Mon Jan 20 14:56:26 CST 2020
+*/
 public class DeviceMessage {
 	private Channel  channel;
     /**

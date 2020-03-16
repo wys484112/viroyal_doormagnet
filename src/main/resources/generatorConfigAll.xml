@@ -37,8 +37,37 @@
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>	
-							
+				
 		
+		<table tableName="t_service_settings_device_brightness" domainObjectName="ServiceSettingsDeviceBrightness"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+			
+		<table tableName="t_service_settings_device_reportinterval" domainObjectName="ServiceSettingsDeviceReportInterval"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+
+		<table tableName="t_service_settings_device_lightingstrategy" domainObjectName="ServiceSettingsDeviceLightingStrategy"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+		<table tableName="t_service_settings_device_time" domainObjectName="ServiceSettingsDeviceTime"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+		<table tableName="t_service_settings_device_installationstate_anglethreadhold" domainObjectName="ServiceSettingsDeviceInstallationstateAnglethreadhold"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>																			
+
+		<table tableName="t_service_settings_device_powerconsumption" domainObjectName="ServiceSettingsDevicePowerConsumption"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>		
+			
+						
 			DeviceResponse findLastresponse(@Param("imei")String imei, @Param("control")Integer control);
 		
 		

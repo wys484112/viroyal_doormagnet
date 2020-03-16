@@ -151,6 +151,82 @@ CREATE TABLE `t_service_settings_device_switch` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+/*设置1~3路灯的亮度等级*/
+CREATE TABLE `t_service_settings_device_brightness` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `brightnessControlOne` int(11) DEFAULT NULL COMMENT '控制器1对应灯的亮度',  
+  `brightnessControlTwo` int(11) DEFAULT NULL COMMENT '控制器2对应灯的亮度',  
+  `brightnessControlThree` int(11) DEFAULT NULL COMMENT '控制器3对应灯的亮度',  
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设置设备定时上报时间间隔*/
+CREATE TABLE `t_service_settings_device_reportinterval` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `reportInterval` int(11) DEFAULT NULL COMMENT '设备定时上报时间间隔',  
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*设置1~3路灯的亮灯策略*/
+CREATE TABLE `t_service_settings_device_lightingstrategy` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `lightNum` int(11) DEFAULT NULL COMMENT '控制器上灯编号',  
+  `strategyNum` int(11) DEFAULT NULL COMMENT '策略编号',  
+  `strategyPeriod` int(11) DEFAULT NULL COMMENT '策略周期',  
+  `timeNum` int(11) DEFAULT NULL COMMENT '时间段个数',  
+  `timehex` text DEFAULT NULL COMMENT '时间段十六进制数组',    
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*设置时间给设备*/
+CREATE TABLE `t_service_settings_device_time` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `year` int(11) DEFAULT NULL COMMENT '年',  
+  `month` int(11) DEFAULT NULL COMMENT '月',  
+  `day` int(11) DEFAULT NULL COMMENT '日',  
+  `hour` int(11) DEFAULT NULL COMMENT '小时',  
+  `minute` int(11) DEFAULT NULL COMMENT '分钟', 
+  `second` int(11) DEFAULT NULL COMMENT '秒',      
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*设置安装状态及角度阀值*/
+CREATE TABLE `t_service_settings_device_installationstate_anglethreadhold` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `installationStable` int(11) DEFAULT NULL COMMENT '设备是否已经安装稳定',  
+  `angleThreadhold` int(11) DEFAULT NULL COMMENT '设备角度阀值',    
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*设置耗电量*/
+CREATE TABLE `t_service_settings_device_powerconsumption` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `imei` char(15) DEFAULT NULL COMMENT '设备id',
+  `powerConsumptionIntegerPart` int(11) DEFAULT NULL COMMENT '耗电量整数部分',
+  `powerConsumptionDecimalPart` int(11) DEFAULT NULL COMMENT '耗电量小数部分', 
+  `mid` char(2) DEFAULT '11' COMMENT 'Mid',    
+  `time` datetime DEFAULT NULL COMMENT '设置信息发出时间',      
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `t_device` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
