@@ -301,24 +301,24 @@ public class DeviceMngImpl implements IDeviceMng {
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingCellId(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingCellId(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.getDeviceSettingCellId(token, devId);
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingSoftVersion(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingSoftVersion(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.getDeviceSettingSoftVersion(token, devId);
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingHardVersion(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingHardVersion(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.getDeviceSettingHardVersion(token, devId);
 	}
 
 	@Override
@@ -329,10 +329,10 @@ public class DeviceMngImpl implements IDeviceMng {
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingPowerConsumption(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.getDeviceSettingPowerConsumption(token, devId);
 	}
 
 	@Override

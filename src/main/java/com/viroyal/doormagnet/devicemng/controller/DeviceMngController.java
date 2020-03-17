@@ -200,6 +200,58 @@ public class DeviceMngController {
         };
     }
     
+	@GetMapping("v1/{imei}/cellid")	
+    public Callable<BaseResponse> getDeviceSettingCellId(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+                return mDeviceMng.getDeviceSettingCellId(token, imei);
+            }
+        };
+    }
+	
+	@GetMapping("v1/{imei}/softversion")	
+    public Callable<BaseResponse> getDeviceSettingSoftVersion(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+                return mDeviceMng.getDeviceSettingSoftVersion(token, imei);
+            }
+        };
+    }
+	
+	@GetMapping("v1/{imei}/hardversion")	
+    public Callable<BaseResponse> getDeviceSettingHardVersion(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+                return mDeviceMng.getDeviceSettingHardVersion(token, imei);
+            }
+        };
+    }
+	
+	@GetMapping("v1/{imei}/hardversion")	
+    public Callable<BaseResponse> getDeviceSettingPowerConsumption(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+                return mDeviceMng.getDeviceSettingPowerConsumption(token, imei);
+            }
+        };
+    }
+	
     @PostMapping("v1/{imei}/installationstateanglethreadhold")	
     public Callable<BaseResponse> setDeviceSettingInstallationstateAnglethreadhold(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());

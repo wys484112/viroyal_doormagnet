@@ -232,24 +232,24 @@ public class DeviceServer implements IDeviceServer {
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingCellId(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingCellId(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.getDeviceSettingCellId(token, devId);
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingSoftVersion(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingSoftVersion(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.getDeviceSettingSoftVersion(token, devId);
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingHardVersion(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingHardVersion(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.getDeviceSettingHardVersion(token, devId);
 	}
 
 	@Override
@@ -260,10 +260,10 @@ public class DeviceServer implements IDeviceServer {
 	}
 
 	@Override
-	public BaseResponse getDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param)
+	public BaseResponse getDeviceSettingPowerConsumption(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.getDeviceSettingPowerConsumption(token, devId);
 	}
 
 	@Override

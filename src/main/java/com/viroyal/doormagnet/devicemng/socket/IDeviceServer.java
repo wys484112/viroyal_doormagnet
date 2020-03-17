@@ -63,19 +63,19 @@ public interface IDeviceServer {
     BaseResponse setDeviceSettingReboot(String token, String devId) throws TokenInvalidException;
 
     //查询路灯CELLID
-    BaseResponse getDeviceSettingCellId(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse getDeviceSettingCellId(String token, String devId) throws TokenInvalidException;
 
     //查询路灯软件版本号
-    BaseResponse getDeviceSettingSoftVersion(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse getDeviceSettingSoftVersion(String token, String devId) throws TokenInvalidException;
 
     //查询路灯硬件版本号
-    BaseResponse getDeviceSettingHardVersion(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse getDeviceSettingHardVersion(String token, String devId) throws TokenInvalidException;
 
     //设置路灯安装状态及角度阀值
     BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId, ServiceSettingsDeviceInstallationstateAnglethreadhold param) throws TokenInvalidException;
 
     //查询耗电量
-    BaseResponse getDeviceSettingPowerConsumption(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse getDeviceSettingPowerConsumption(String token, String devId) throws TokenInvalidException;
 
     //设置耗电量
     BaseResponse setDeviceSettingPowerConsumption(String token, String devId, ServiceSettingsDevicePowerConsumption param) throws TokenInvalidException;

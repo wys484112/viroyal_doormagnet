@@ -117,11 +117,38 @@ public class MessageDispatcher {
 		//设备主动上报信息处理
 		case "00":
 			switch (message.getControlhexstr()) {
-			case "01":
+			case "01"://3.1设备定时上报数据
 				onDevMessage01(message);
 				test(message);
 				break;
+			case "02"://3.2设备请求读时间
 
+				break;
+			case "03"://3.3设备上报CELLID
+
+				break;
+			case "04"://3.4设备上报软件版本号
+
+				break;
+			case "05"://3.5设备上报固件版本号
+
+				break;
+			case "06"://3.6设备开关灯异常报警
+
+				break;	
+			case "07"://3.7灯具大电流报警
+
+				break;	
+			case "08"://3.8倾斜器报警
+
+				break;	
+			case "09"://3.9 上报耗电量
+
+				break;		
+			case "0a"://3.10 保持连接的心跳
+
+				break;	
+				
 			default:
 				break;
 			}
@@ -663,6 +690,93 @@ public class MessageDispatcher {
 		return sendMsgAndReceiveResponse(toDeviceMessage);
 	}
 	
+	
+	public BaseResponse getDeviceSettingCellId(String token, String devId) {
+		// TODO Auto-generated method stub
+		logger.info(" getImei==" + devId);
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		toDeviceMessage.setImei(devId);
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("17");
+		toDeviceMessage.setContentlengthhexstr("0002");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse getDeviceSettingSoftVersion(String token, String devId) {
+		// TODO Auto-generated method stub
+		logger.info(" getImei==" + devId);
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		toDeviceMessage.setImei(devId);
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("18");
+		toDeviceMessage.setContentlengthhexstr("0002");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+
+	public BaseResponse getDeviceSettingHardVersion(String token, String devId) {
+		// TODO Auto-generated method stub
+		logger.info(" getImei==" + devId);
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		toDeviceMessage.setImei(devId);
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("19");
+		toDeviceMessage.setContentlengthhexstr("0002");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}	
 	public BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId,
 			ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
 		// TODO Auto-generated method stub
@@ -701,6 +815,34 @@ public class MessageDispatcher {
 		return sendMsgAndReceiveResponse(toDeviceMessage);
 	}
 
+	public BaseResponse getDeviceSettingPowerConsumption(String token, String devId) {
+		// TODO Auto-generated method stub
+		logger.info(" getImei==" + devId);
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		toDeviceMessage.setImei(devId);
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("1b");
+		toDeviceMessage.setContentlengthhexstr("0002");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
 	public BaseResponse setDeviceSettingPowerConsumption(String token, String devId, ServiceSettingsDevicePowerConsumption param) {
 		// TODO Auto-generated method stub
 		ServiceSettingsDevicePowerConsumption test = param;
@@ -736,5 +878,10 @@ public class MessageDispatcher {
 
 		return sendMsgAndReceiveResponse(toDeviceMessage);
 	}
+
+
+
+
+
     
 }
