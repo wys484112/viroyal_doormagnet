@@ -2,25 +2,26 @@ package com.viroyal.doormagnet.devicemng.socket;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-
-import com.mysql.cj.Constants;
-import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReadTimeMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportAngleAbnormalMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportCellIdMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportCurrentAbnormalMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportHardVersionMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportLightAbnormalMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportPowerConsumptionAbnormalMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportSoftVersionMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceResponseMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceBrightnessMapper;
@@ -30,16 +31,7 @@ import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDevicePowerConsump
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceReportIntervalMapper;
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper;
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceTimeMapper;
-import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
-import com.viroyal.doormagnet.devicemng.model.DeviceResponse;
-import com.viroyal.doormagnet.devicemng.model.DeviceStatus;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceBrightness;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceInstallationstateAnglethreadhold;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceLightingStrategy;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDevicePowerConsumption;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceReportInterval;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceSwitch;
-import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
+import com.viroyal.doormagnet.devicemng.model.*;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
 import com.viroyal.doormagnet.util.ErrorCode;
 import com.viroyal.doormagnet.util.MyConstant;
@@ -57,9 +49,6 @@ public class MessageDispatcher {
 	@Autowired
 	private DeviceStatusMapper mDeviceStatusMapper;
 
-	@Autowired
-	private DeviceResponseMapper deviceresponsemapper;
-	
     @Autowired
     private DeviceMessageMapper deviceMessageMapper;
     
@@ -86,6 +75,31 @@ public class MessageDispatcher {
     
     @Autowired
     private ServiceSettingsDevicePowerConsumptionMapper serviceSettingsDevicePowerConsumptionMapper;
+    
+    @Autowired
+    private DeviceReadTimeMapper deviceReadTimeMapper;
+    
+    @Autowired
+    private DeviceReportCellIdMapper deviceReportCellIdMapper;
+    
+    @Autowired
+    private DeviceReportSoftVersionMapper deviceReportSoftVersionMapper;
+    
+    @Autowired
+    private DeviceReportHardVersionMapper deviceReportHardVersionMapper;
+    
+    @Autowired
+    private DeviceReportLightAbnormalMapper deviceReportLightAbnormalMapper;
+    
+    @Autowired
+    private DeviceReportCurrentAbnormalMapper deviceReportCurrentAbnormalMapper;
+    
+    @Autowired
+    private DeviceReportAngleAbnormalMapper deviceReportAngleAbnormalMapper;
+    
+    @Autowired
+    private DeviceReportPowerConsumptionAbnormalMapper deviceReportPowerConsumptionAbnormalMapper;
+    
     final Object object =new Object();
 
     
@@ -131,21 +145,27 @@ public class MessageDispatcher {
 				onDevMessage04(message);
 				break;
 			case "05"://3.5设备上报固件版本号
+				onDevMessage05(message);
 
 				break;
 			case "06"://3.6设备开关灯异常报警
+				onDevMessage06(message);
 
 				break;	
 			case "07"://3.7灯具大电流报警
+				onDevMessage07(message);
 
 				break;	
 			case "08"://3.8倾斜器报警
+				onDevMessage08(message);
 
 				break;	
 			case "09"://3.9 上报耗电量
+				onDevMessage09(message);
 
 				break;		
 			case "0a"://3.10 保持连接的心跳
+				onDevMessage0a(message);
 
 				break;	
 				
@@ -195,7 +215,7 @@ public class MessageDispatcher {
 		response.setTime(new Date());
 
 		
-		deviceresponsemapper.insert(response);
+		deviceResponseMapper.insert(response);
 		logger.info("onDevMessageResponse，response imei==" + response.getImei()+"  control"+message.getControlhexstr());
 		int aa=deviceMessageMapper.deleteByImeiAndControl(message.getImei(), MyConstant.controlResponseControlHEXMap.get(message.getControlhexstr()));
 		logger.info("onDevMessageResponse，deleteByImeiAndControl aa==" + aa);
@@ -269,7 +289,7 @@ public class MessageDispatcher {
 		DeviceMessage toDeviceMessage = new DeviceMessage();
 		toDeviceMessage.setChannel(message.getChannel());
 		toDeviceMessage.setFlaghexstr("01");
-		toDeviceMessage.setControlhexstr("01");
+		toDeviceMessage.setControlhexstr(message.getControlhexstr());
 		toDeviceMessage.setContentlengthhexstr("0001");
 		toDeviceMessage.setContenthexstr(isRight?"00":"01");
 		sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
@@ -277,77 +297,202 @@ public class MessageDispatcher {
 
 	
 	private void onDevMessage02(DeviceMessage message) throws Exception {
-		DeviceStatus status=new DeviceStatus();
-		status.setImei(message.getImei());
-		String contentHexStr=message.getContenthexstr();
-		
-		
-		String voltage=contentHexStr.substring(30, 34);//2
-		String current=contentHexStr.substring(34, 38);//2
-		String activepower=contentHexStr.substring(38, 44);//3
-		String reactivepower=contentHexStr.substring(44, 50);//3
-		String powerfactor=contentHexStr.substring(50, 52);//1
-		String temperature=contentHexStr.substring(52, 54);//1
-		String powerconsumptionintegerpart=contentHexStr.substring(54, 58);//2
-		String powerconsumptiondecimalpart=contentHexStr.substring(58, 60);//1
-		String brightnesscontrolone=contentHexStr.substring(60, 62);//1
-		String brightnesscontroltwo=contentHexStr.substring(62, 64);//1
-		String brightnesscontrolthree=contentHexStr.substring(64, 66);//1
-		String switchcontrolone=contentHexStr.substring(66, 68);//1
-		String switchcontroltwo=contentHexStr.substring(68, 70);//1
-		String switchcontrolthree=contentHexStr.substring(70, 72);//1
-		String signalstrengthabsolutevalue=contentHexStr.substring(72, 74);//1
-		String dimmingmode=contentHexStr.substring(74, 76);//1
-		String abnormalflag=contentHexStr.substring(76, 78);//1
-		String angleone=contentHexStr.substring(78, 82);//2
-		String angletwo=contentHexStr.substring(82, 86);//2
-		String angleoriginalone=contentHexStr.substring(86, 90);//2
-		String angleoriginaltwo=contentHexStr.substring(90, 94);//2
-		
-		status.setCurrent(Integer.parseInt(current, 16));
-		status.setVoltage(Integer.parseInt(voltage, 16));
-		status.setActivepower(Integer.parseInt(activepower, 16));
-		status.setReactivepower(Integer.parseInt(reactivepower, 16));
-		status.setPowerfactor(Integer.parseInt(powerfactor, 16));		
-		status.setTemperature(Integer.parseInt(temperature, 16));
-		status.setPowerconsumptionintegerpart(Integer.parseInt(powerconsumptionintegerpart, 16));
-		status.setPowerconsumptiondecimalpart(Integer.parseInt(powerconsumptiondecimalpart, 16));
-		status.setBrightnesscontrolone(Integer.parseInt(brightnesscontrolone, 16));
-		status.setBrightnesscontroltwo(Integer.parseInt(brightnesscontroltwo, 16));
-		status.setBrightnesscontrolthree(Integer.parseInt(brightnesscontrolthree, 16));
-		status.setSwitchcontrolone(Integer.parseInt(switchcontrolone, 16));
-		status.setSwitchcontroltwo(Integer.parseInt(switchcontroltwo, 16));
-		status.setSwitchcontrolthree(Integer.parseInt(switchcontrolthree, 16));
-		status.setSignalstrengthabsolutevalue(Integer.parseInt(signalstrengthabsolutevalue, 16));
-		status.setDimmingmode(Integer.parseInt(dimmingmode, 16));
-		status.setAbnormalflag(Integer.parseInt(abnormalflag, 16));
-		status.setAngleone(Integer.parseInt(angleone, 16));
-		status.setAngletwo(Integer.parseInt(angletwo, 16));
-		status.setAngleoriginalone(Integer.parseInt(angleoriginalone, 16));
-		status.setAngleoriginaltwo(Integer.parseInt(angleoriginaltwo, 16));
+		DeviceReadTime temp=new DeviceReadTime();
+		temp.setImei(message.getImei());
+	
 //		Date d=new Date();
 //        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 
-		status.setTime(new Date());
+		temp.setTime(new Date());
 
-		int index= mDeviceStatusMapper.insertSelective(status);
-    	logger.info("onDevMessage01 insertSelective index:"+index);        
+		int index= deviceReadTimeMapper.insertSelective(temp);
+    	logger.info("insertSelective index:"+index);        
 
-		//判断状态中的电流电源 等数据是否正常，对设备进行回复
-    	onServiceResponse01(message,true);		
+		//判断数据是否正常，对设备进行回复
+    	onServiceResponse02(message,true);		
 	}
-	private void onServiceResponse02(DeviceMessage message,Boolean isRight) throws Exception {
-		DeviceMessage toDeviceMessage = new DeviceMessage();
-		toDeviceMessage.setChannel(message.getChannel());
-		toDeviceMessage.setFlaghexstr("01");
-		toDeviceMessage.setControlhexstr("01");
-		toDeviceMessage.setContentlengthhexstr("0001");
-		toDeviceMessage.setContenthexstr(isRight?"00":"01");
-		sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
+
+	private void onServiceResponse02(DeviceMessage message, Boolean isRight) throws Exception {
+
+		Calendar c = Calendar.getInstance();// 可以对每个时间域单独修改
+
+		ServiceSettingsDeviceTime temp = new ServiceSettingsDeviceTime();
+		temp.setImei(message.getImei());
+		temp.setYear(c.get(Calendar.YEAR));
+		temp.setMonth(c.get(Calendar.MONTH));
+		temp.setDay(c.get(Calendar.DATE));
+		temp.setHour(c.get(Calendar.HOUR));
+		temp.setMinute(c.get(Calendar.MINUTE));
+		temp.setSecond(c.get(Calendar.SECOND));
+
+		setDeviceSettingTime(null, null, temp);
 	}
 	
-	
+	private void onDevMessage03(DeviceMessage message) throws Exception {
+		DeviceReportCellId temp = new DeviceReportCellId();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
 
+		String cellId = contentHexStr.substring(30, 34);// 2
+
+		temp.setCellid(Integer.parseInt(cellId, 16));
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportCellIdMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}
+
+	private void onDevMessage04(DeviceMessage message) throws Exception {
+		DeviceReportSoftVersion temp = new DeviceReportSoftVersion();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+		String softversionHexStr = contentHexStr.substring(30);//
+
+		temp.setSoftversion(TextUtils.hexStr2AscIIStr(softversionHexStr));
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportSoftVersionMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}
+	
+	private void onDevMessage05(DeviceMessage message) throws Exception {
+		DeviceReportHardVersion temp = new DeviceReportHardVersion();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+		String hardversionHexStr = contentHexStr.substring(30);//
+
+		temp.setHardversion(TextUtils.hexStr2AscIIStr(hardversionHexStr));
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportHardVersionMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}
+	
+	private void onDevMessage06(DeviceMessage message) throws Exception {
+		DeviceReportLightAbnormal temp = new DeviceReportLightAbnormal();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+		String statusHexStr = contentHexStr.substring(30);//
+
+		temp.setLightstatus((byte) Integer.parseInt(statusHexStr, 16));
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportLightAbnormalMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}
+	
+	private void onDevMessage07(DeviceMessage message) throws Exception {
+		DeviceReportCurrentAbnormal temp = new DeviceReportCurrentAbnormal();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+		String statusHexStr = contentHexStr.substring(30);//
+
+		temp.setCurrentstatus((byte) Integer.parseInt(statusHexStr, 16));
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportCurrentAbnormalMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}	
+	
+	private void onDevMessage08(DeviceMessage message) throws Exception {
+		DeviceReportAngleAbnormal temp = new DeviceReportAngleAbnormal();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+
+		temp.setAbnormalflag((byte) Integer.parseInt(contentHexStr.substring(30,32), 16));
+		temp.setAngleone(Integer.parseInt(contentHexStr.substring(32,36), 16)/10);
+		temp.setAngletwo(Integer.parseInt(contentHexStr.substring(36,40), 16)/10);
+		temp.setAngleoriginalone(Integer.parseInt(contentHexStr.substring(40,44), 16)/10);
+		temp.setAngleoriginaltwo(Integer.parseInt(contentHexStr.substring(44,48), 16)/10);
+		temp.setAnglethreadhold(Integer.parseInt(contentHexStr.substring(48,52), 16)/10);
+
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportAngleAbnormalMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}	
+	
+	private void onDevMessage09(DeviceMessage message) throws Exception {
+		DeviceReportPowerConsumptionAbnormal temp = new DeviceReportPowerConsumptionAbnormal();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+		temp.setPowerconsumptionintegerpart(Integer.parseInt(contentHexStr.substring(30,34), 16));
+		temp.setPowerconsumptiondecimalpart(Integer.parseInt(contentHexStr.substring(34,38), 16));
+		
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportPowerConsumptionAbnormalMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}	
+	
+	
+	private void onDevMessage0a(DeviceMessage message) throws Exception {
+		DeviceReportPowerConsumptionAbnormal temp = new DeviceReportPowerConsumptionAbnormal();
+		temp.setImei(message.getImei());
+		String contentHexStr = message.getContenthexstr();
+
+		temp.setPowerconsumptionintegerpart(Integer.parseInt(contentHexStr.substring(30,34), 16));
+		temp.setPowerconsumptiondecimalpart(Integer.parseInt(contentHexStr.substring(34,38), 16));
+		
+		// Date d=new Date();
+		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		temp.setTime(new Date());
+
+		int index = deviceReportPowerConsumptionAbnormalMapper.insertSelective(temp);
+		logger.info("onDevMessage01 insertSelective index:" + index);
+
+		// 判断状态中数据是否正常，对设备进行回复
+		onServiceResponse01(message, true);
+	}	
     public DeviceMessage decodeMessage(Channel ch, byte[] msg) {
     	DeviceMessage base =new DeviceMessage();
     	String message=new String(msg).trim().toUpperCase(Locale.US);
