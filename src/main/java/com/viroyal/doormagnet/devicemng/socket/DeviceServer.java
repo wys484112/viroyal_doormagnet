@@ -225,10 +225,10 @@ public class DeviceServer implements IDeviceServer {
 	}
 
 	@Override
-	public BaseResponse setDeviceSettingReboot(String token, String devId, DeviceSetting param)
+	public BaseResponse setDeviceSettingReboot(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return messagedispatcher.setDeviceSettingReboot(token, devId);
 	}
 
 	@Override

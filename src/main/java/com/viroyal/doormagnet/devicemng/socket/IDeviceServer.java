@@ -60,7 +60,7 @@ public interface IDeviceServer {
     BaseResponse setDeviceSettingTime(String token, String devId, ServiceSettingsDeviceTime param) throws TokenInvalidException;
 
     //设置路灯重启
-    BaseResponse setDeviceSettingReboot(String token, String devId, DeviceSetting param) throws TokenInvalidException;
+    BaseResponse setDeviceSettingReboot(String token, String devId) throws TokenInvalidException;
 
     //查询路灯CELLID
     BaseResponse getDeviceSettingCellId(String token, String devId, DeviceSetting param) throws TokenInvalidException;

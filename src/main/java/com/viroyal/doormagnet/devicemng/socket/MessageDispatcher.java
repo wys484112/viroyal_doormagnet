@@ -634,6 +634,35 @@ public class MessageDispatcher {
 		return sendMsgAndReceiveResponse(toDeviceMessage);
 	}
 
+	public BaseResponse setDeviceSettingReboot(String token, String devId) {
+		// TODO Auto-generated method stub
+		logger.info(" getImei==" + devId);
+
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		logger.info("setDeviceSettingSwitch getChannelFromImei=="
+				+ DeviceServer.ALLCHANNELS_GROUP.getChannelFromImei(devId));
+
+		toDeviceMessage.setImei(devId);
+		toDeviceMessage.setHeadhexstr("6F01");
+		toDeviceMessage.setFlaghexstr("00");
+		toDeviceMessage.setControlhexstr("16");
+		toDeviceMessage.setContentlengthhexstr("0002");
+		
+		
+		StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append(TextUtils.byte2HexStr("11".getBytes()));				
+		toDeviceMessage.setContenthexstr(stringBuffer.toString());
+		
+		
+		toDeviceMessage.setResponsecontrolhexstr(MyConstant.controlResponseControlHEXMap.get(toDeviceMessage.getControlhexstr()));
+		toDeviceMessage.setTime(new Date());
+		logger.info("setDeviceSettingSwitch thread==" + Thread.currentThread().getName());
+
+		return sendMsgAndReceiveResponse(toDeviceMessage);
+	}
+	
 	public BaseResponse setDeviceSettingInstallationstateAnglethreadhold(String token, String devId,
 			ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
 		// TODO Auto-generated method stub

@@ -294,10 +294,10 @@ public class DeviceMngImpl implements IDeviceMng {
 	}
 
 	@Override
-	public BaseResponse setDeviceSettingReboot(String token, String devId, DeviceSetting param)
+	public BaseResponse setDeviceSettingReboot(String token, String devId)
 			throws TokenInvalidException {
 		// TODO Auto-generated method stub
-		return null;
+		return mIDeviceServer.setDeviceSettingReboot(token, devId);
 	}
 
 	@Override

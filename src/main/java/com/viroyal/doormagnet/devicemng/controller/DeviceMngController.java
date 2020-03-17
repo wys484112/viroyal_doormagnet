@@ -187,6 +187,19 @@ public class DeviceMngController {
         };
     }
     
+    @PostMapping("v1/{imei}/reboot")	
+    public Callable<BaseResponse> setDeviceSettingReboot(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
+		logger.info("外部线程：" + Thread.currentThread().getName());
+        return new Callable<BaseResponse>() {
+
+            @Override
+            public BaseResponse call() throws Exception {
+            	logger.info("内部线程：" + Thread.currentThread().getName());
+            	return mDeviceMng.setDeviceSettingReboot(token, imei);
+            }
+        };
+    }
+    
     @PostMapping("v1/{imei}/installationstateanglethreadhold")	
     public Callable<BaseResponse> setDeviceSettingInstallationstateAnglethreadhold(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
