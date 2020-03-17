@@ -122,13 +122,13 @@ public class MessageDispatcher {
 				test(message);
 				break;
 			case "02"://3.2设备请求读时间
-
+				onDevMessage02(message);
 				break;
 			case "03"://3.3设备上报CELLID
-
+				onDevMessage03(message);
 				break;
 			case "04"://3.4设备上报软件版本号
-
+				onDevMessage04(message);
 				break;
 			case "05"://3.5设备上报固件版本号
 
@@ -275,6 +275,76 @@ public class MessageDispatcher {
 		sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
 	}
 
+	
+	private void onDevMessage02(DeviceMessage message) throws Exception {
+		DeviceStatus status=new DeviceStatus();
+		status.setImei(message.getImei());
+		String contentHexStr=message.getContenthexstr();
+		
+		
+		String voltage=contentHexStr.substring(30, 34);//2
+		String current=contentHexStr.substring(34, 38);//2
+		String activepower=contentHexStr.substring(38, 44);//3
+		String reactivepower=contentHexStr.substring(44, 50);//3
+		String powerfactor=contentHexStr.substring(50, 52);//1
+		String temperature=contentHexStr.substring(52, 54);//1
+		String powerconsumptionintegerpart=contentHexStr.substring(54, 58);//2
+		String powerconsumptiondecimalpart=contentHexStr.substring(58, 60);//1
+		String brightnesscontrolone=contentHexStr.substring(60, 62);//1
+		String brightnesscontroltwo=contentHexStr.substring(62, 64);//1
+		String brightnesscontrolthree=contentHexStr.substring(64, 66);//1
+		String switchcontrolone=contentHexStr.substring(66, 68);//1
+		String switchcontroltwo=contentHexStr.substring(68, 70);//1
+		String switchcontrolthree=contentHexStr.substring(70, 72);//1
+		String signalstrengthabsolutevalue=contentHexStr.substring(72, 74);//1
+		String dimmingmode=contentHexStr.substring(74, 76);//1
+		String abnormalflag=contentHexStr.substring(76, 78);//1
+		String angleone=contentHexStr.substring(78, 82);//2
+		String angletwo=contentHexStr.substring(82, 86);//2
+		String angleoriginalone=contentHexStr.substring(86, 90);//2
+		String angleoriginaltwo=contentHexStr.substring(90, 94);//2
+		
+		status.setCurrent(Integer.parseInt(current, 16));
+		status.setVoltage(Integer.parseInt(voltage, 16));
+		status.setActivepower(Integer.parseInt(activepower, 16));
+		status.setReactivepower(Integer.parseInt(reactivepower, 16));
+		status.setPowerfactor(Integer.parseInt(powerfactor, 16));		
+		status.setTemperature(Integer.parseInt(temperature, 16));
+		status.setPowerconsumptionintegerpart(Integer.parseInt(powerconsumptionintegerpart, 16));
+		status.setPowerconsumptiondecimalpart(Integer.parseInt(powerconsumptiondecimalpart, 16));
+		status.setBrightnesscontrolone(Integer.parseInt(brightnesscontrolone, 16));
+		status.setBrightnesscontroltwo(Integer.parseInt(brightnesscontroltwo, 16));
+		status.setBrightnesscontrolthree(Integer.parseInt(brightnesscontrolthree, 16));
+		status.setSwitchcontrolone(Integer.parseInt(switchcontrolone, 16));
+		status.setSwitchcontroltwo(Integer.parseInt(switchcontroltwo, 16));
+		status.setSwitchcontrolthree(Integer.parseInt(switchcontrolthree, 16));
+		status.setSignalstrengthabsolutevalue(Integer.parseInt(signalstrengthabsolutevalue, 16));
+		status.setDimmingmode(Integer.parseInt(dimmingmode, 16));
+		status.setAbnormalflag(Integer.parseInt(abnormalflag, 16));
+		status.setAngleone(Integer.parseInt(angleone, 16));
+		status.setAngletwo(Integer.parseInt(angletwo, 16));
+		status.setAngleoriginalone(Integer.parseInt(angleoriginalone, 16));
+		status.setAngleoriginaltwo(Integer.parseInt(angleoriginaltwo, 16));
+//		Date d=new Date();
+//        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+
+		status.setTime(new Date());
+
+		int index= mDeviceStatusMapper.insertSelective(status);
+    	logger.info("onDevMessage01 insertSelective index:"+index);        
+
+		//判断状态中的电流电源 等数据是否正常，对设备进行回复
+    	onServiceResponse01(message,true);		
+	}
+	private void onServiceResponse02(DeviceMessage message,Boolean isRight) throws Exception {
+		DeviceMessage toDeviceMessage = new DeviceMessage();
+		toDeviceMessage.setChannel(message.getChannel());
+		toDeviceMessage.setFlaghexstr("01");
+		toDeviceMessage.setControlhexstr("01");
+		toDeviceMessage.setContentlengthhexstr("0001");
+		toDeviceMessage.setContenthexstr(isRight?"00":"01");
+		sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
+	}
 	
 	
 

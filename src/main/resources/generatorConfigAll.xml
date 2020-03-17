@@ -67,7 +67,45 @@
 			enableDeleteByExample="false" enableSelectByExample="false"
 			selectByExampleQueryId="false"></table>		
 			
-						
+			
+		
+		<table tableName="t_device_read_time" domainObjectName="DeviceReadTime"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+		<table tableName="t_device_report_cellid" domainObjectName="DeviceReportCellId"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+		<table tableName="t_device_report_softversion" domainObjectName="DeviceReportSoftVersion"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+		<table tableName="t_device_report_hardversion" domainObjectName="DeviceReportHardVersion"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+		<table tableName="t_device_report_lightabnormal" domainObjectName="DeviceReportLightAbnormal"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>
+		<table tableName="t_device_report_currentabnormal" domainObjectName="DeviceReportCurrentAbnormal"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>		
+		<table tableName="t_device_report_angleabnormal" domainObjectName="DeviceReportAngleAbnormal"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>			
+		<table tableName="t_device_report_powerconsumptionabnormal" domainObjectName="DeviceReportPowerConsumptionAbnormal"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+		<table tableName="t_device_report_heartbeat" domainObjectName="DeviceReportHeartBeat"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false"></table>	
+																				
 			DeviceResponse findLastresponse(@Param("imei")String imei, @Param("control")Integer control);
 		
 		
