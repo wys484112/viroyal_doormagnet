@@ -19,6 +19,7 @@ import com.viroyal.doormagnet.devicemng.mapper.DeviceReportAngleAbnormalMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReportCellIdMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReportCurrentAbnormalMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReportHardVersionMapper;
+import com.viroyal.doormagnet.devicemng.mapper.DeviceReportHeartBeatMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReportLightAbnormalMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReportPowerConsumptionAbnormalMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReportSoftVersionMapper;
@@ -99,6 +100,9 @@ public class MessageDispatcher {
     
     @Autowired
     private DeviceReportPowerConsumptionAbnormalMapper deviceReportPowerConsumptionAbnormalMapper;
+    
+    @Autowired
+    private DeviceReportHeartBeatMapper deviceReportHeartBeatMapper;
     
     final Object object =new Object();
 
@@ -475,19 +479,16 @@ public class MessageDispatcher {
 	
 	
 	private void onDevMessage0a(DeviceMessage message) throws Exception {
-		DeviceReportPowerConsumptionAbnormal temp = new DeviceReportPowerConsumptionAbnormal();
+		DeviceReportHeartBeat temp = new DeviceReportHeartBeat();
 		temp.setImei(message.getImei());
 		String contentHexStr = message.getContenthexstr();
-
-		temp.setPowerconsumptionintegerpart(Integer.parseInt(contentHexStr.substring(30,34), 16));
-		temp.setPowerconsumptiondecimalpart(Integer.parseInt(contentHexStr.substring(34,38), 16));
 		
 		// Date d=new Date();
 		// SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		temp.setTime(new Date());
 
-		int index = deviceReportPowerConsumptionAbnormalMapper.insertSelective(temp);
+		int index = deviceReportHeartBeatMapper.insertSelective(temp);
 		logger.info("onDevMessage01 insertSelective index:" + index);
 
 		// 判断状态中数据是否正常，对设备进行回复
