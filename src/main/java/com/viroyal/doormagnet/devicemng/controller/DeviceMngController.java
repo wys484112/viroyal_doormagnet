@@ -239,7 +239,7 @@ public class DeviceMngController {
         };
     }
 	
-	@GetMapping("v1/{imei}/hardversion")	
+	@GetMapping("v1/{imei}/powerconsumption")	
     public Callable<BaseResponse> getDeviceSettingPowerConsumption(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
         return new Callable<BaseResponse>() {
