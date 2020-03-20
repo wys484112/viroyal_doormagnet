@@ -1,4 +1,4 @@
-package com.viroyal.doormagnet;
+package com.viroyal.doormagnet.config;
 
 import cn.jiguang.common.ClientConfig;
 import cn.jpush.api.JPushClient;
