@@ -2,7 +2,7 @@ package com.viroyal.doormagnet.devicemng.pojo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.viroyal.doormagnet.util.ErrorCode;
+import com.viroyal.doormagnet.common.util.ErrorCode;
 
 /**
  * 绑定协议响应封装

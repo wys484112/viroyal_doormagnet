@@ -1,4 +1,4 @@
-package com.viroyal.doormagnet.util;
+package com.viroyal.doormagnet.common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

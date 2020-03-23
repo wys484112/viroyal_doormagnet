@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import com.viroyal.doormagnet.common.util.ErrorCode;
+import com.viroyal.doormagnet.common.util.MyConstant;
+import com.viroyal.doormagnet.common.util.TextUtils;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceMessageMapper;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceReadTimeMapper;
@@ -34,9 +38,6 @@ import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceSwitchMapper
 import com.viroyal.doormagnet.devicemng.mapper.ServiceSettingsDeviceTimeMapper;
 import com.viroyal.doormagnet.devicemng.model.*;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
-import com.viroyal.doormagnet.util.ErrorCode;
-import com.viroyal.doormagnet.util.MyConstant;
-import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

@@ -11,9 +11,9 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.viroyal.doormagnet.common.util.RandomUtil;
+import com.viroyal.doormagnet.common.util.TextUtils;
 import com.viroyal.doormagnet.devicemng.model.DeviceMessage;
-import com.viroyal.doormagnet.util.RandomUtil;
-import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

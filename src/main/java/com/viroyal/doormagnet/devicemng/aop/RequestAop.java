@@ -3,10 +3,11 @@ package com.viroyal.doormagnet.devicemng.aop;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.viroyal.doormagnet.common.util.JsonUtil;
+import com.viroyal.doormagnet.common.util.RandomUtil;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
 import com.viroyal.doormagnet.devicemng.pojo.BaseResponse;
-import com.viroyal.doormagnet.util.JsonUtil;
-import com.viroyal.doormagnet.util.RandomUtil;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

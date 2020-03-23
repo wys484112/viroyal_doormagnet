@@ -18,11 +18,14 @@ import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.notification.AndroidNotification;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
+
+import com.viroyal.doormagnet.common.util.RandomUtil;
+import com.viroyal.doormagnet.common.util.TextUtils;
+import com.viroyal.doormagnet.common.util.Utils;
 import com.viroyal.doormagnet.devicemng.entity.*;
 import com.viroyal.doormagnet.devicemng.mapper.DeviceStatusMapper;
 import com.viroyal.doormagnet.devicemng.pojo.BindUser;
-import com.viroyal.doormagnet.util.RandomUtil;
-import com.viroyal.doormagnet.util.Utils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -31,8 +34,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import com.viroyal.doormagnet.util.TextUtils;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

@@ -1,5 +1,7 @@
 package com.viroyal.doormagnet.devicemng.service.impl;
 
+import com.viroyal.doormagnet.common.util.ErrorCode;
+import com.viroyal.doormagnet.common.util.TextUtils;
 import com.viroyal.doormagnet.devicemng.entity.Device;
 import com.viroyal.doormagnet.devicemng.entity.DeviceOpLog;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
@@ -17,8 +19,7 @@ import com.viroyal.doormagnet.devicemng.model.ServiceSettingsDeviceTime;
 import com.viroyal.doormagnet.devicemng.pojo.*;
 import com.viroyal.doormagnet.devicemng.service.IDeviceMng;
 import com.viroyal.doormagnet.devicemng.socket.IDeviceServer;
-import com.viroyal.doormagnet.util.ErrorCode;
-import com.viroyal.doormagnet.util.TextUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

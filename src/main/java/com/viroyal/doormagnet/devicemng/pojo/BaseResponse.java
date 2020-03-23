@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.viroyal.doormagnet.util.ErrorCode;
-import com.viroyal.doormagnet.util.MYException;
+import com.viroyal.doormagnet.common.util.ErrorCode;
+import com.viroyal.doormagnet.common.util.MYException;
 
 /**
  * 通用响应封装

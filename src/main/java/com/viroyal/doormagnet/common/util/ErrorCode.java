@@ -1,4 +1,4 @@
-package com.viroyal.doormagnet.util;
+package com.viroyal.doormagnet.common.util;
 
 public interface ErrorCode {
     int SUCCESS = 1000;

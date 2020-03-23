@@ -1,4 +1,4 @@
-package com.viroyal.doormagnet.util;
+package com.viroyal.doormagnet.common.util;
 
 import java.util.Random;
 import java.util.UUID;
