@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableScheduling
 @EnableTransactionManagement
 @EnableAsync //开启异步调用
-@MapperScan("com.viroyal.doormagnet.devicemng.mapper")
+//@MapperScan("com.viroyal.doormagnet.devicemng.mapper")
+@MapperScan({"com.viroyal.doormagnet.devicemng.mapper","com.viroyal.doormagnet.modules.*.mapper"})
 public class DoorMagnetApplication {
     private static final Logger Logger = LoggerFactory.getLogger(DoorMagnetApplication.class);
 
