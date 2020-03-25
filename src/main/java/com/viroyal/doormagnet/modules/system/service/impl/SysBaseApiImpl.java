@@ -13,19 +13,42 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.apache.shiro.SecurityUtils;
-
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.viroyal.doormagnet.DoorMagnetApplication;
+import com.viroyal.doormagnet.common.constant.CacheConstant;
+import com.viroyal.doormagnet.common.constant.CommonConstant;
+import com.viroyal.doormagnet.common.constant.DataBaseConstant;
+import com.viroyal.doormagnet.common.exception.JeecgBootException;
 import com.viroyal.doormagnet.common.system.api.ISysBaseAPI;
+import com.viroyal.doormagnet.common.system.vo.ComboModel;
+import com.viroyal.doormagnet.common.system.vo.DynamicDataSourceModel;
+import com.viroyal.doormagnet.common.system.vo.LoginUser;
+import com.viroyal.doormagnet.common.util.IPUtils;
 import com.viroyal.doormagnet.common.util.SpringContextUtils;
+import com.viroyal.doormagnet.common.util.SysAnnmentTypeEnum;
+import com.viroyal.doormagnet.common.util.oConvertUtils;
+import com.viroyal.doormagnet.common.util.oss.OssBootUtil;
+import com.viroyal.doormagnet.modules.message.websocket.WebSocket;
+import com.viroyal.doormagnet.modules.system.mapper.SysAnnouncementMapper;
+import com.viroyal.doormagnet.modules.system.mapper.SysAnnouncementSendMapper;
+import com.viroyal.doormagnet.modules.system.mapper.SysLogMapper;
 import com.viroyal.doormagnet.modules.system.mapper.SysRoleMapper;
 import com.viroyal.doormagnet.modules.system.mapper.SysUserMapper;
 import com.viroyal.doormagnet.modules.system.mapper.SysUserRoleMapper;
+import com.viroyal.doormagnet.modules.system.model.SysAnnouncement;
+import com.viroyal.doormagnet.modules.system.model.SysAnnouncementSend;
+import com.viroyal.doormagnet.modules.system.model.SysAnnouncementWithBLOBs;
+import com.viroyal.doormagnet.modules.system.model.SysLog;
+import com.viroyal.doormagnet.modules.system.model.SysRole;
+import com.viroyal.doormagnet.modules.system.model.SysUser;
+import com.viroyal.doormagnet.modules.system.util.MinioUtil;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,10 +60,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 public class SysBaseApiImpl implements ISysBaseAPI {
+    private static final Logger Logger = LoggerFactory.getLogger(SysBaseApiImpl.class);	
 	/** 当前系统数据库类型 */
 	public static String DB_TYPE = "";
-	@Autowired
-	private ISysMessageTemplateService sysMessageTemplateService;
 	@Resource
 	private SysLogMapper sysLogMapper;
 	@Autowired
@@ -48,24 +70,15 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 	@Autowired
 	private SysUserRoleMapper sysUserRoleMapper;
 	@Autowired
-	private ISysDepartService sysDepartService;
-	@Autowired
-	private ISysDictService sysDictService;
-	@Resource
 	private SysAnnouncementMapper sysAnnouncementMapper;
-	@Resource
-	private SysAnnouncementSendMapper sysAnnouncementSendMapper;
+	@Autowired
+	private SysAnnouncementSendMapper sysAnnouncementSendMapper;	
 	@Resource
     private WebSocket webSocket;
 	@Resource
 	private SysRoleMapper roleMapper;
-	@Resource
-	private SysDepartMapper departMapper;
-	@Resource
-	private SysCategoryMapper categoryMapper;
 
-	@Autowired
-	private ISysDataSourceService dataSourceService;
+
 
 	@Override
 	public void addLog(String LogContent, Integer logType, Integer operatetype) {
@@ -120,7 +133,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 			return null;
 		}
 		LoginUser loginUser = new LoginUser();
-		SysUser sysUser = userMapper.selectById(id);
+		SysUser sysUser = userMapper.selectByPrimaryKey(id);
 		if(sysUser==null) {
 			return null;
 		}
@@ -133,25 +146,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 		return sysUserRoleMapper.getRoleByUserName(username);
 	}
 
-	@Override
-	public List<String> getDepartIdsByUsername(String username) {
-		List<SysDepart> list = sysDepartService.queryDepartsByUsername(username);
-		List<String> result = new ArrayList<>(list.size());
-		for (SysDepart depart : list) {
-			result.add(depart.getId());
-		}
-		return result;
-	}
 
-	@Override
-	public List<String> getDepartNamesByUsername(String username) {
-		List<SysDepart> list = sysDepartService.queryDepartsByUsername(username);
-		List<String> result = new ArrayList<>(list.size());
-		for (SysDepart depart : list) {
-			result.add(depart.getDepartName());
-		}
-		return result;
-	}
 
 	@Override
 	public String getDatabaseType() throws SQLException {
@@ -159,20 +154,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 		return getDatabaseTypeByDataSource(dataSource);
 	}
 
-	@Override
-	public List<DictModel> queryDictItemsByCode(String code) {
-		return sysDictService.queryDictItemsByCode(code);
-	}
 
-	@Override
-	public List<DictModel> queryTableDictItemsByCode(String table, String text, String code) {
-		return sysDictService.queryTableDictItemsByCode(table, text, code);
-	}
-
-	@Override
-	public List<DictModel> queryAllDepartBackDictModel() {
-		return sysDictService.queryAllDepartBackDictModel();
-	}
 
 	@Override
 	public void sendSysAnnouncement(String fromUser, String toUser, String title, String msgContent) {
@@ -181,7 +163,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 
 	@Override
 	public void sendSysAnnouncement(String fromUser, String toUser, String title, String msgContent, String setMsgCategory) {
-		SysAnnouncement announcement = new SysAnnouncement();
+		SysAnnouncementWithBLOBs announcement = new SysAnnouncementWithBLOBs();
 		announcement.setTitile(title);
 		announcement.setMsgContent(msgContent);
 		announcement.setSender(fromUser);
@@ -220,7 +202,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 
 	@Override
 	public void sendSysAnnouncement(String fromUser, String toUser, String title, String msgContent, String setMsgCategory, String busType, String busId) {
-		SysAnnouncement announcement = new SysAnnouncement();
+		SysAnnouncementWithBLOBs announcement = new SysAnnouncementWithBLOBs();
 		announcement.setTitile(title);
 		announcement.setMsgContent(msgContent);
 		announcement.setSender(fromUser);
@@ -261,149 +243,116 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 	}
 
 	@Override
-	public void updateSysAnnounReadFlag(String busType, String busId) {
-		SysAnnouncement announcement = sysAnnouncementMapper.selectOne(new QueryWrapper<SysAnnouncement>().eq("bus_type",busType).eq("bus_id",busId));
-		if(announcement != null){
-			LoginUser sysUser = (LoginUser)SecurityUtils.getSubject().getPrincipal();
-			String userId = sysUser.getId();
-			LambdaUpdateWrapper<SysAnnouncementSend> updateWrapper = new UpdateWrapper().lambda();
-			updateWrapper.set(SysAnnouncementSend::getReadFlag, CommonConstant.HAS_READ_FLAG);
-			updateWrapper.set(SysAnnouncementSend::getReadTime, new Date());
-			updateWrapper.last("where annt_id ='"+announcement.getId()+"' and user_id ='"+userId+"'");
-			SysAnnouncementSend announcementSend = new SysAnnouncementSend();
-			sysAnnouncementSendMapper.update(announcementSend, updateWrapper);
-		}
-	}
-
-	@Override
-    public String parseTemplateByCode(String templateCode,Map<String, String> map) {
-        List<SysMessageTemplate> sysSmsTemplates = sysMessageTemplateService.selectByCode(templateCode);
-        if(sysSmsTemplates==null||sysSmsTemplates.size()==0){
-            throw new JeecgBootException("消息模板不存在，模板编码："+templateCode);
-        }
-        SysMessageTemplate sysSmsTemplate = sysSmsTemplates.get(0);
-        //模板内容
-        String content = sysSmsTemplate.getTemplateContent();
-        if(map!=null) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                String str = "${" + entry.getKey() + "}";
-                content = content.replace(str, entry.getValue());
-            }
-        }
-        return content;
-    }
-
-	@Override
 	public void sendSysAnnouncement(String fromUser, String toUser,String title,Map<String, String> map, String templateCode) {
-		List<SysMessageTemplate> sysSmsTemplates = sysMessageTemplateService.selectByCode(templateCode);
-        if(sysSmsTemplates==null||sysSmsTemplates.size()==0){
-            throw new JeecgBootException("消息模板不存在，模板编码："+templateCode);
-        }
-		SysMessageTemplate sysSmsTemplate = sysSmsTemplates.get(0);
-		//模板标题
-		title = title==null?sysSmsTemplate.getTemplateName():title;
-		//模板内容
-		String content = sysSmsTemplate.getTemplateContent();
-		if(map!=null) {
-			for (Map.Entry<String, String> entry : map.entrySet()) {
-				String str = "${" + entry.getKey() + "}";
-				title = title.replace(str, entry.getValue());
-				content = content.replace(str, entry.getValue());
-			}
-		}
-
-		SysAnnouncement announcement = new SysAnnouncement();
-		announcement.setTitile(title);
-		announcement.setMsgContent(content);
-		announcement.setSender(fromUser);
-		announcement.setPriority(CommonConstant.PRIORITY_M);
-		announcement.setMsgType(CommonConstant.MSG_TYPE_UESR);
-		announcement.setSendStatus(CommonConstant.HAS_SEND);
-		announcement.setSendTime(new Date());
-		announcement.setMsgCategory(CommonConstant.MSG_CATEGORY_2);
-		announcement.setDelFlag(String.valueOf(CommonConstant.DEL_FLAG_0));
-		sysAnnouncementMapper.insert(announcement);
-		// 2.插入用户通告阅读标记表记录
-		String userId = toUser;
-		String[] userIds = userId.split(",");
-		String anntId = announcement.getId();
-		for(int i=0;i<userIds.length;i++) {
-			if(oConvertUtils.isNotEmpty(userIds[i])) {
-				SysUser sysUser = userMapper.getUserByName(userIds[i]);
-				if(sysUser==null) {
-					continue;
-				}
-				SysAnnouncementSend announcementSend = new SysAnnouncementSend();
-				announcementSend.setAnntId(anntId);
-				announcementSend.setUserId(sysUser.getId());
-				announcementSend.setReadFlag(CommonConstant.NO_READ_FLAG);
-				sysAnnouncementSendMapper.insert(announcementSend);
-				JSONObject obj = new JSONObject();
-				obj.put("cmd", "user");
-				obj.put("userId", sysUser.getId());
-				obj.put("msgId", announcement.getId());
-				obj.put("msgTxt", announcement.getTitile());
-				webSocket.sendOneMessage(sysUser.getId(), obj.toJSONString());
-			}
-		}
+//		List<SysMessageTemplate> sysSmsTemplates = sysMessageTemplateService.selectByCode(templateCode);
+//        if(sysSmsTemplates==null||sysSmsTemplates.size()==0){
+//            throw new JeecgBootException("消息模板不存在，模板编码："+templateCode);
+//        }
+//		SysMessageTemplate sysSmsTemplate = sysSmsTemplates.get(0);
+//		//模板标题
+//		title = title==null?sysSmsTemplate.getTemplateName():title;
+//		//模板内容
+//		String content = sysSmsTemplate.getTemplateContent();
+//		if(map!=null) {
+//			for (Map.Entry<String, String> entry : map.entrySet()) {
+//				String str = "${" + entry.getKey() + "}";
+//				title = title.replace(str, entry.getValue());
+//				content = content.replace(str, entry.getValue());
+//			}
+//		}
+//
+//		SysAnnouncementWithBLOBs announcement = new SysAnnouncementWithBLOBs();
+//		announcement.setTitile(title);
+//		announcement.setMsgContent(content);
+//		announcement.setSender(fromUser);
+//		announcement.setPriority(CommonConstant.PRIORITY_M);
+//		announcement.setMsgType(CommonConstant.MSG_TYPE_UESR);
+//		announcement.setSendStatus(CommonConstant.HAS_SEND);
+//		announcement.setSendTime(new Date());
+//		announcement.setMsgCategory(CommonConstant.MSG_CATEGORY_2);
+//		announcement.setDelFlag(String.valueOf(CommonConstant.DEL_FLAG_0));
+//		sysAnnouncementMapper.insert(announcement);
+//		// 2.插入用户通告阅读标记表记录
+//		String userId = toUser;
+//		String[] userIds = userId.split(",");
+//		String anntId = announcement.getId();
+//		for(int i=0;i<userIds.length;i++) {
+//			if(oConvertUtils.isNotEmpty(userIds[i])) {
+//				SysUser sysUser = userMapper.getUserByName(userIds[i]);
+//				if(sysUser==null) {
+//					continue;
+//				}
+//				SysAnnouncementSend announcementSend = new SysAnnouncementSend();
+//				announcementSend.setAnntId(anntId);
+//				announcementSend.setUserId(sysUser.getId());
+//				announcementSend.setReadFlag(CommonConstant.NO_READ_FLAG);
+//				sysAnnouncementSendMapper.insert(announcementSend);
+//				JSONObject obj = new JSONObject();
+//				obj.put("cmd", "user");
+//				obj.put("userId", sysUser.getId());
+//				obj.put("msgId", announcement.getId());
+//				obj.put("msgTxt", announcement.getTitile());
+//				webSocket.sendOneMessage(sysUser.getId(), obj.toJSONString());
+//			}
+//		}
 	}
 
 	@Override
 	public void sendSysAnnouncement(String fromUser, String toUser, String title, Map<String, String> map, String templateCode, String busType, String busId) {
-		List<SysMessageTemplate> sysSmsTemplates = sysMessageTemplateService.selectByCode(templateCode);
-		if(sysSmsTemplates==null||sysSmsTemplates.size()==0){
-			throw new JeecgBootException("消息模板不存在，模板编码："+templateCode);
-		}
-		SysMessageTemplate sysSmsTemplate = sysSmsTemplates.get(0);
-		//模板标题
-		title = title==null?sysSmsTemplate.getTemplateName():title;
-		//模板内容
-		String content = sysSmsTemplate.getTemplateContent();
-		if(map!=null) {
-			for (Map.Entry<String, String> entry : map.entrySet()) {
-				String str = "${" + entry.getKey() + "}";
-				title = title.replace(str, entry.getValue());
-				content = content.replace(str, entry.getValue());
-			}
-		}
-		SysAnnouncement announcement = new SysAnnouncement();
-		announcement.setTitile(title);
-		announcement.setMsgContent(content);
-		announcement.setSender(fromUser);
-		announcement.setPriority(CommonConstant.PRIORITY_M);
-		announcement.setMsgType(CommonConstant.MSG_TYPE_UESR);
-		announcement.setSendStatus(CommonConstant.HAS_SEND);
-		announcement.setSendTime(new Date());
-		announcement.setMsgCategory(CommonConstant.MSG_CATEGORY_2);
-		announcement.setDelFlag(String.valueOf(CommonConstant.DEL_FLAG_0));
-		announcement.setBusId(busId);
-		announcement.setBusType(busType);
-		announcement.setOpenType(SysAnnmentTypeEnum.getByType(busType).getOpenType());
-		announcement.setOpenPage(SysAnnmentTypeEnum.getByType(busType).getOpenPage());
-		sysAnnouncementMapper.insert(announcement);
-		// 2.插入用户通告阅读标记表记录
-		String userId = toUser;
-		String[] userIds = userId.split(",");
-		String anntId = announcement.getId();
-		for(int i=0;i<userIds.length;i++) {
-			if(oConvertUtils.isNotEmpty(userIds[i])) {
-				SysUser sysUser = userMapper.getUserByName(userIds[i]);
-				if(sysUser==null) {
-					continue;
-				}
-				SysAnnouncementSend announcementSend = new SysAnnouncementSend();
-				announcementSend.setAnntId(anntId);
-				announcementSend.setUserId(sysUser.getId());
-				announcementSend.setReadFlag(CommonConstant.NO_READ_FLAG);
-				sysAnnouncementSendMapper.insert(announcementSend);
-				JSONObject obj = new JSONObject();
-				obj.put("cmd", "user");
-				obj.put("userId", sysUser.getId());
-				obj.put("msgId", announcement.getId());
-				obj.put("msgTxt", announcement.getTitile());
-				webSocket.sendOneMessage(sysUser.getId(), obj.toJSONString());
-			}
-		}
+//		List<SysMessageTemplate> sysSmsTemplates = sysMessageTemplateService.selectByCode(templateCode);
+//		if(sysSmsTemplates==null||sysSmsTemplates.size()==0){
+//			throw new JeecgBootException("消息模板不存在，模板编码："+templateCode);
+//		}
+//		SysMessageTemplate sysSmsTemplate = sysSmsTemplates.get(0);
+//		//模板标题
+//		title = title==null?sysSmsTemplate.getTemplateName():title;
+//		//模板内容
+//		String content = sysSmsTemplate.getTemplateContent();
+//		if(map!=null) {
+//			for (Map.Entry<String, String> entry : map.entrySet()) {
+//				String str = "${" + entry.getKey() + "}";
+//				title = title.replace(str, entry.getValue());
+//				content = content.replace(str, entry.getValue());
+//			}
+//		}
+//		SysAnnouncementWithBLOBs announcement = new SysAnnouncementWithBLOBs();
+//		announcement.setTitile(title);
+//		announcement.setMsgContent(content);
+//		announcement.setSender(fromUser);
+//		announcement.setPriority(CommonConstant.PRIORITY_M);
+//		announcement.setMsgType(CommonConstant.MSG_TYPE_UESR);
+//		announcement.setSendStatus(CommonConstant.HAS_SEND);
+//		announcement.setSendTime(new Date());
+//		announcement.setMsgCategory(CommonConstant.MSG_CATEGORY_2);
+//		announcement.setDelFlag(String.valueOf(CommonConstant.DEL_FLAG_0));
+//		announcement.setBusId(busId);
+//		announcement.setBusType(busType);
+//		announcement.setOpenType(SysAnnmentTypeEnum.getByType(busType).getOpenType());
+//		announcement.setOpenPage(SysAnnmentTypeEnum.getByType(busType).getOpenPage());
+//		sysAnnouncementMapper.insert(announcement);
+//		// 2.插入用户通告阅读标记表记录
+//		String userId = toUser;
+//		String[] userIds = userId.split(",");
+//		String anntId = announcement.getId();
+//		for(int i=0;i<userIds.length;i++) {
+//			if(oConvertUtils.isNotEmpty(userIds[i])) {
+//				SysUser sysUser = userMapper.getUserByName(userIds[i]);
+//				if(sysUser==null) {
+//					continue;
+//				}
+//				SysAnnouncementSend announcementSend = new SysAnnouncementSend();
+//				announcementSend.setAnntId(anntId);
+//				announcementSend.setUserId(sysUser.getId());
+//				announcementSend.setReadFlag(CommonConstant.NO_READ_FLAG);
+//				sysAnnouncementSendMapper.insert(announcementSend);
+//				JSONObject obj = new JSONObject();
+//				obj.put("cmd", "user");
+//				obj.put("userId", sysUser.getId());
+//				obj.put("msgId", announcement.getId());
+//				obj.put("msgTxt", announcement.getTitile());
+//				webSocket.sendOneMessage(sysUser.getId(), obj.toJSONString());
+//			}
+//		}
 	}
 
 	/**
@@ -430,7 +379,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 					throw new JeecgBootException("数据库类型:["+dbType+"]不识别!");
 				}
 			} catch (Exception e) {
-				log.error(e.getMessage(), e);
+				Logger.error(e.getMessage(), e);
 			}finally {
 				connection.close();
 			}
@@ -439,111 +388,94 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 		
 	}
 
-	@Override
-	public List<DictModel> queryAllDict() {
-		// 查询并排序
-		QueryWrapper<SysDict> queryWrapper = new QueryWrapper<SysDict>();
-		queryWrapper.orderByAsc("create_time");
-		List<SysDict> dicts = sysDictService.list(queryWrapper);
-		// 封装成 model
-		List<DictModel> list = new ArrayList<DictModel>();
-		for (SysDict dict : dicts) {
-			list.add(new DictModel(dict.getDictCode(), dict.getDictName()));
-		}
 
-		return list;
-	}
 
-	@Override
-	public List<SysCategoryModel> queryAllDSysCategory() {
-		List<SysCategory> ls = categoryMapper.selectList(null);
-		List<SysCategoryModel> res = oConvertUtils.entityListToModelList(ls,SysCategoryModel.class);
-		return res;
-	}
 
-	@Override
-	public List<DictModel> queryFilterTableDictInfo(String table, String text, String code, String filterSql) {
-		return sysDictService.queryTableDictItemsByCodeAndFilter(table,text,code,filterSql);
-	}
-
-	@Override
-	public List<String> queryTableDictByKeys(String table, String text, String code, String[] keyArray) {
-		return sysDictService.queryTableDictByKeys(table,text,code,keyArray);
-	}
 
 	@Override
 	public List<ComboModel> queryAllUser() {
-		List<ComboModel> list = new ArrayList<ComboModel>();
-		List<SysUser> userList = userMapper.selectList(new QueryWrapper<SysUser>().eq("status","1").eq("del_flag","0"));
-		for(SysUser user : userList){
-			ComboModel model = new ComboModel();
-			model.setTitle(user.getRealname());
-			model.setId(user.getId());
-			model.setUsername(user.getUsername());
-			list.add(model);
-		}
-		return list;
+//		List<ComboModel> list = new ArrayList<ComboModel>();
+//		List<SysUser> userList = userMapper.selectList(new QueryWrapper<SysUser>().eq("status","1").eq("del_flag","0"));
+//		for(SysUser user : userList){
+//			ComboModel model = new ComboModel();
+//			model.setTitle(user.getRealname());
+//			model.setId(user.getId());
+//			model.setUsername(user.getUsername());
+//			list.add(model);
+//		}
+//		return list;
+		
+        return  null;        
 	}
 
     @Override
     public JSONObject queryAllUser(String[] userIds,int pageNo,int pageSize) {
-		JSONObject json = new JSONObject();
-		QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().eq("status","1").eq("del_flag","0");
-        List<ComboModel> list = new ArrayList<ComboModel>();
-		Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
-		IPage<SysUser> pageList = userMapper.selectPage(page, queryWrapper);
-        for(SysUser user : pageList.getRecords()){
-            ComboModel model = new ComboModel();
-            model.setUsername(user.getUsername());
-            model.setTitle(user.getRealname());
-            model.setId(user.getId());
-            model.setEmail(user.getEmail());
-            if(oConvertUtils.isNotEmpty(userIds)){
-                for(int i = 0; i<userIds.length;i++){
-                    if(userIds[i].equals(user.getId())){
-                        model.setChecked(true);
-                    }
-                }
-            }
-            list.add(model);
-        }
-		json.put("list",list);
-        json.put("total",pageList.getTotal());
-        return json;
+//		JSONObject json = new JSONObject();
+//		QueryWrapper<SysUser> queryWrapper = new QueryWrapper<SysUser>().eq("status","1").eq("del_flag","0");
+//        List<ComboModel> list = new ArrayList<ComboModel>();
+//		Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
+//		IPage<SysUser> pageList = userMapper.selectPage(page, queryWrapper);
+//        for(SysUser user : pageList.getRecords()){
+//            ComboModel model = new ComboModel();
+//            model.setUsername(user.getUsername());
+//            model.setTitle(user.getRealname());
+//            model.setId(user.getId());
+//            model.setEmail(user.getEmail());
+//            if(oConvertUtils.isNotEmpty(userIds)){
+//                for(int i = 0; i<userIds.length;i++){
+//                    if(userIds[i].equals(user.getId())){
+//                        model.setChecked(true);
+//                    }
+//                }
+//            }
+//            list.add(model);
+//        }
+//		json.put("list",list);
+//        json.put("total",pageList.getTotal());
+//        return json;
+        
+        return  null;
+
     }
 
 	@Override
 	public List<ComboModel> queryAllRole() {
-		List<ComboModel> list = new ArrayList<ComboModel>();
-		List<SysRole> roleList = roleMapper.selectList(new QueryWrapper<SysRole>());
-		for(SysRole role : roleList){
-			ComboModel model = new ComboModel();
-			model.setTitle(role.getRoleName());
-			model.setId(role.getId());
-			list.add(model);
-		}
-		return list;
+//		List<ComboModel> list = new ArrayList<ComboModel>();
+//		List<SysRole> roleList = roleMapper.selectList(new QueryWrapper<SysRole>());
+//		for(SysRole role : roleList){
+//			ComboModel model = new ComboModel();
+//			model.setTitle(role.getRoleName());
+//			model.setId(role.getId());
+//			list.add(model);
+//		}
+//		return list;
+		
+        return  null;
+
+        
 	}
 
     @Override
     public List<ComboModel> queryAllRole(String[] roleIds) {
-        List<ComboModel> list = new ArrayList<ComboModel>();
-        List<SysRole> roleList = roleMapper.selectList(new QueryWrapper<SysRole>());
-        for(SysRole role : roleList){
-            ComboModel model = new ComboModel();
-            model.setTitle(role.getRoleName());
-            model.setId(role.getId());
-            model.setRoleCode(role.getRoleCode());
-            if(oConvertUtils.isNotEmpty(roleIds)) {
-                for (int i = 0; i < roleIds.length; i++) {
-                    if (roleIds[i].equals(role.getId())) {
-                        model.setChecked(true);
-                    }
-                }
-            }
-            list.add(model);
-        }
-        return list;
+//        List<ComboModel> list = new ArrayList<ComboModel>();
+//        List<SysRole> roleList = roleMapper.selectList(new QueryWrapper<SysRole>());
+//        for(SysRole role : roleList){
+//            ComboModel model = new ComboModel();
+//            model.setTitle(role.getRoleName());
+//            model.setId(role.getId());
+//            model.setRoleCode(role.getRoleCode());
+//            if(oConvertUtils.isNotEmpty(roleIds)) {
+//                for (int i = 0; i < roleIds.length; i++) {
+//                    if (roleIds[i].equals(role.getId())) {
+//                        model.setChecked(true);
+//                    }
+//                }
+//            }
+//            list.add(model);
+//        }
+//        return list;
+        
+        return  null;
     }
 
 	@Override
@@ -551,51 +483,7 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 		return sysUserRoleMapper.getRoleIdByUserName(username);
 	}
 
-	@Override
-	public String getDepartIdsByOrgCode(String orgCode) {
-		return departMapper.queryDepartIdByOrgCode(orgCode);
-	}
 
-	@Override
-	public DictModel getParentDepartId(String departId) {
-		SysDepart depart = departMapper.getParentDepartId(departId);
-		DictModel model = new DictModel(depart.getId(),depart.getParentId());
-		return model;
-	}
-
-	@Override
-	public List<SysDepartModel> getAllSysDepart() {
-		List<SysDepartModel> departModelList = new ArrayList<SysDepartModel>();
-		List<SysDepart> departList = departMapper.selectList(new QueryWrapper<SysDepart>().eq("del_flag","0"));
-		for(SysDepart depart : departList){
-			SysDepartModel model = new SysDepartModel();
-			BeanUtils.copyProperties(depart,model);
-			departModelList.add(model);
-		}
-		return departModelList;
-	}
-
-	@Override
-	public DynamicDataSourceModel getDynamicDbSourceById(String dbSourceId) {
-		SysDataSource dbSource = dataSourceService.getById(dbSourceId);
-		return new DynamicDataSourceModel(dbSource);
-	}
-
-	@Override
-	public DynamicDataSourceModel getDynamicDbSourceByCode(String dbSourceCode) {
-		SysDataSource dbSource = dataSourceService.getOne(new LambdaQueryWrapper<SysDataSource>().eq(SysDataSource::getCode, dbSourceCode));
-		return new DynamicDataSourceModel(dbSource);
-	}
-
-	@Override
-	public List<String> getDeptHeadByDepId(String deptId) {
-		List<SysUser> userList = userMapper.selectList(new QueryWrapper<SysUser>().like("depart_ids",deptId).eq("status","1").eq("del_flag","0"));
-		List<String> list = new ArrayList<>();
-		for(SysUser user : userList){
-			list.add(user.getUsername());
-		}
-		return list;
-	}
 
 	@Override
 	public String upload(MultipartFile file,String bizPath,String uploadType) {
@@ -606,6 +494,18 @@ public class SysBaseApiImpl implements ISysBaseAPI {
 			url = OssBootUtil.upload(file,bizPath);
 		}
 		return url;
+	}
+
+	@Override
+	public List<String> getDepartIdsByUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getDepartNamesByUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

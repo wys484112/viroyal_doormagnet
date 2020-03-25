@@ -10,27 +10,12 @@
 			targetProject="src/main/resources/mybatis" />
 		<javaClientGenerator targetPackage="com.viroyal.doormagnet.modules.system.mapper"
 			targetProject="src/main/java" type="XMLMAPPER" />
-				
-		<table tableName="sys_user" domainObjectName="SysUser"
+
+		<table tableName="sys_announcement_send" domainObjectName="SysAnnouncementSend"
 			enableCountByExample="false" enableUpdateByExample="false"
 			enableDeleteByExample="false" enableSelectByExample="false"
-			selectByExampleQueryId="false"></table>	
-		<table tableName="sys_role" domainObjectName="SysRole"
-			enableCountByExample="false" enableUpdateByExample="false"
-			enableDeleteByExample="false" enableSelectByExample="false"
-			selectByExampleQueryId="false"></table>	
-		<table tableName="sys_permission" domainObjectName="SysPermission"
-			enableCountByExample="false" enableUpdateByExample="false"
-			enableDeleteByExample="false" enableSelectByExample="false"
-			selectByExampleQueryId="false"></table>	
-		<table tableName="sys_role_permission" domainObjectName="SysRolePermission"
-			enableCountByExample="false" enableUpdateByExample="false"
-			enableDeleteByExample="false" enableSelectByExample="false"
-			selectByExampleQueryId="false"></table>	
-		<table tableName="sys_user_role" domainObjectName="SysUserRole"
-			enableCountByExample="false" enableUpdateByExample="false"
-			enableDeleteByExample="false" enableSelectByExample="false"
-			selectByExampleQueryId="false"></table>	
+			selectByExampleQueryId="false"></table>		
+									
 																	
 	</context> 
 </generatorConfiguration>

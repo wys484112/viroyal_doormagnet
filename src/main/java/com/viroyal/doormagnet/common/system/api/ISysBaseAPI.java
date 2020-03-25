@@ -77,16 +77,13 @@ public interface ISysBaseAPI {
 	 * @param code
 	 * @return
 	 */
-	public List<DictModel> queryDictItemsByCode(String code);
 
 	/** 查询所有的父级字典，按照create_time排序 */
-	public List<DictModel> queryAllDict();
 
     /**
      * 查询所有分类字典
      * @return
      */
-	public List<SysCategoryModel> queryAllDSysCategory();
 
 	/**
 	  * 获取表数据字典
@@ -95,13 +92,11 @@ public interface ISysBaseAPI {
 	 * @param code
 	 * @return
 	 */
-    List<DictModel> queryTableDictItemsByCode(String table, String text, String code);
     
     /**
    	 * 查询所有部门 作为字典信息 id -->value,departName -->text
    	 * @return
    	 */
-   	public List<DictModel> queryAllDepartBackDictModel();
    	
 	/**
 	 * 发送系统消息
@@ -141,7 +136,6 @@ public interface ISysBaseAPI {
 	 * @param map          模板参数
 	 * @return
 	 */
-	public String parseTemplateByCode(String templateCode, Map<String, String> map);
 
 
 	/**
@@ -171,7 +165,6 @@ public interface ISysBaseAPI {
 	 * @param busType
 	 * @param busId
 	 */
-	public void updateSysAnnounReadFlag(String busType,String busId);
 	/**
 	 * 查询表字典 支持过滤数据
 	 * @param table
@@ -180,7 +173,6 @@ public interface ISysBaseAPI {
 	 * @param filterSql
 	 * @return
 	 */
-	public List<DictModel> queryFilterTableDictInfo(String table, String text, String code, String filterSql);
 
 	/**
 	 * 查询指定table的 text code 获取字典，包含text和value
@@ -190,7 +182,6 @@ public interface ISysBaseAPI {
 	 * @param keyArray
 	 * @return
 	 */
-	public List<String> queryTableDictByKeys(String table, String text, String code, String[] keyArray);
 
 	/**
 	 * 获取所有有效用户
@@ -230,20 +221,17 @@ public interface ISysBaseAPI {
 	 * @param orgCode
 	 * @return
 	 */
-	public String getDepartIdsByOrgCode(String orgCode);
 
 	/**
 	 * 查询上一级部门
 	 * @param departId
 	 * @return
 	 */
-	public DictModel getParentDepartId(String departId);
 
 	/**
 	 * 查询所有部门
 	 * @return
 	 */
-	public List<SysDepartModel> getAllSysDepart();
 
 	/**
 	 * 根据 id 查询数据库中存储的 DynamicDataSourceModel
@@ -251,7 +239,6 @@ public interface ISysBaseAPI {
 	 * @param dbSourceId
 	 * @return
 	 */
-	DynamicDataSourceModel getDynamicDbSourceById(String dbSourceId);
 
 	/**
 	 * 根据 code 查询数据库中存储的 DynamicDataSourceModel
@@ -259,14 +246,7 @@ public interface ISysBaseAPI {
 	 * @param dbSourceCode
 	 * @return
 	 */
-	DynamicDataSourceModel getDynamicDbSourceByCode(String dbSourceCode);
 
-	/**
-	 * 根据部门Id获取部门负责人
-	 * @param deptId
-	 * @return
-	 */
-	public List<String> getDeptHeadByDepId(String deptId);
 
 	/**
 	 * 文件上传

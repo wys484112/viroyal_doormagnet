@@ -23,7 +23,14 @@ jeecg :
      accessKeySecret: ??
   shiro:
      excludeUrls: /test/jeecgDemo/demo3,/test/jeecgDemo/redisDemo/**
-     
+  # minio文件上传
+  minio:
+    minio_url: http://minio.jeecg.com
+    minio_name: ??
+    minio_pass: ??
+    bucketName: ??
+    
+         
 #极光配置
 jpush:
   APP_KEY: 0e5947cde8ddbd4814d7bd5f

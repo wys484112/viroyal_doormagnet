@@ -11,9 +11,12 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
+import com.viroyal.doormagnet.DoorMagnetApplication;
 
 
 /**
@@ -24,7 +27,8 @@ import com.alibaba.fastjson.JSONObject;
 @Component
 @ServerEndpoint("/websocket/{userId}") //此注解相当于设置访问URL
 public class WebSocket {
-    
+    private static final Logger Logger = LoggerFactory.getLogger(WebSocket.class);
+
     private Session session;
     
     private static CopyOnWriteArraySet<WebSocket> webSockets =new CopyOnWriteArraySet<>();
@@ -36,7 +40,7 @@ public class WebSocket {
 			this.session = session;
 			webSockets.add(this);
 			sessionPool.put(userId, session);
-			log.info("【websocket消息】有新的连接，总数为:"+webSockets.size());
+			Logger.info("【websocket消息】有新的连接，总数为:"+webSockets.size());
 		} catch (Exception e) {
 		}
     }
@@ -45,7 +49,7 @@ public class WebSocket {
     public void onClose() {
         try {
 			webSockets.remove(this);
-			log.info("【websocket消息】连接断开，总数为:"+webSockets.size());
+			Logger.info("【websocket消息】连接断开，总数为:"+webSockets.size());
 		} catch (Exception e) {
 		}
     }
@@ -53,7 +57,7 @@ public class WebSocket {
     @OnMessage
     public void onMessage(String message) {
         //todo 现在有个定时任务刷，应该去掉
-    	log.debug("【websocket消息】收到客户端消息:"+message);
+    	Logger.debug("【websocket消息】收到客户端消息:"+message);
     	JSONObject obj = new JSONObject();
     	obj.put("cmd", "heartcheck");//业务类型
     	obj.put("msgTxt", "心跳响应");//消息内容
@@ -62,7 +66,7 @@ public class WebSocket {
     
     // 此为广播消息
     public void sendAllMessage(String message) {
-    	log.info("【websocket消息】广播消息:"+message);
+    	Logger.info("【websocket消息】广播消息:"+message);
         for(WebSocket webSocket : webSockets) {
             try {
             	if(webSocket.session.isOpen()) {
@@ -79,7 +83,7 @@ public class WebSocket {
         Session session = sessionPool.get(userId);
         if (session != null&&session.isOpen()) {
             try {
-            	log.info("【websocket消息】 单点消息:"+message);
+            	Logger.info("【websocket消息】 单点消息:"+message);
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -93,7 +97,7 @@ public class WebSocket {
     		Session session = sessionPool.get(userId);
             if (session != null&&session.isOpen()) {
                 try {
-                	log.info("【websocket消息】 单点消息:"+message);
+                	Logger.info("【websocket消息】 单点消息:"+message);
                     session.getAsyncRemote().sendText(message);
                 } catch (Exception e) {
                     e.printStackTrace();
