@@ -144,7 +144,7 @@ public class MessageDispatcher {
 			switch (message.getControlhexstr()) {
 			case "01":// 3.1设备定时上报数据
 				onDevMessage01(message);
-				test(message);
+//				test(message);
 				break;
 			case "02":// 3.2设备请求读时间
 				onDevMessage02(message);
