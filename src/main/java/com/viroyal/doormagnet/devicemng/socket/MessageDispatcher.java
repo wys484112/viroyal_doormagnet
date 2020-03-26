@@ -302,7 +302,7 @@ public class MessageDispatcher {
 		toDeviceMessage.setControlhexstr(message.getControlhexstr());
 		toDeviceMessage.setContentlengthhexstr("0001");
 		toDeviceMessage.setContenthexstr(isRight ? "00" : "01");
-		sendMsg(toDeviceMessage.toString(), toDeviceMessage.getChannel());
+		sendMsg(toDeviceMessage.getHexStr(), toDeviceMessage.getChannel());
 	}
 
 	private void onDevMessage02(DeviceMessage message) throws Exception {
