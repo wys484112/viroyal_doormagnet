@@ -399,6 +399,7 @@ public class LoginController {
 	 * @return
 	 * @throws Exception
 	 */
+	@ApiOperation("app登录")	
 	@RequestMapping(value = "/mLogin", method = RequestMethod.POST)
 	public Result<JSONObject> mLogin(@RequestBody SysLoginModel sysLoginModel) throws Exception {
 		Result<JSONObject> result = new Result<JSONObject>();

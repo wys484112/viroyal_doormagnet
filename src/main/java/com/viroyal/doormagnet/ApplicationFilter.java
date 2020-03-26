@@ -34,16 +34,16 @@ public class ApplicationFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) arg0;
         HttpServletResponse response = (HttpServletResponse) arg1;
         String url = request.getRequestURI();
-        if (!"/".equals(url)) {
-            if (!masterKey.equals(request.getHeader("master_key")) /*|| request.getHeader("school_id") == null*/) {
-                try {
-                    returnJson(response, "{\"error_code\":1003,\"error_msg\":\"请升级新版本\"}");
-                    return;
-                } catch (Exception e) {
-                    logger.error("filter return master error exception: " + e);
-                }
-            }
-        }
+//        if (!"/".equals(url)) {
+//            if (!masterKey.equals(request.getHeader("master_key")) /*|| request.getHeader("school_id") == null*/) {
+//                try {
+//                    returnJson(response, "{\"error_code\":1003,\"error_msg\":\"请升级新版本\"}");
+//                    return;
+//                } catch (Exception e) {
+//                    logger.error("filter return master error exception: " + e);
+//                }
+//            }
+//        }
 
         arg2.doFilter(request, response);
     }

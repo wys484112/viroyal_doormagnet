@@ -12,6 +12,9 @@ import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.notification.AndroidNotification;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 import com.viroyal.doormagnet.devicemng.entity.Device;
 import com.viroyal.doormagnet.devicemng.entity.DeviceSetting;
 import com.viroyal.doormagnet.devicemng.exception.TokenInvalidException;
@@ -44,6 +47,7 @@ import java.util.concurrent.Callable;
 
 @RestController
 @RequestMapping("/device/")
+@Api(tags="服务器对设备控制")
 public class DeviceMngController {
     private static final Logger logger = LoggerFactory.getLogger(DeviceMngController.class);
 
@@ -98,7 +102,7 @@ public class DeviceMngController {
             logger.error("Error response from JPush server. Should review and fix it. ", e.getErrorMessage());
         }
     }
-
+	@ApiOperation("获取在线设备")
     @GetMapping("v1/listactive")
     public BaseResponse getDeviceListActive(@RequestHeader("token") String token) throws TokenInvalidException {
         return mDeviceMng.getDeviceList(token);
@@ -109,6 +113,7 @@ public class DeviceMngController {
 //			throws TokenInvalidException {
 //		return mDeviceMng.getDeviceStatusList(token, imei);
 //	}
+	@ApiOperation("获取设备状态信息")	
 	@GetMapping("v1/{imei}/status")	
     public Callable<BaseResponse> getDeviceStatusList(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -121,7 +126,7 @@ public class DeviceMngController {
             }
         };
     }
-    
+	@ApiOperation("设置设备开关")	    
     @PostMapping("v1/{imei}/switch")	
     public Callable<BaseResponse> setDeviceSettingSwitch(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceSwitch param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -135,6 +140,7 @@ public class DeviceMngController {
         };
     }
     
+	@ApiOperation("设置设备亮度")	    
     @PostMapping("v1/{imei}/brightness")	
     public Callable<BaseResponse> setDeviceSettingBrightness(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceBrightness param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -147,7 +153,7 @@ public class DeviceMngController {
             }
         };
     }
-   
+	@ApiOperation("设置设备上报间隔")	    
     @PostMapping("v1/{imei}/reportinterval")	
     public Callable<BaseResponse> setDeviceSettingReportInterval(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceReportInterval param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -160,7 +166,7 @@ public class DeviceMngController {
             }
         };
     }
-    
+	@ApiOperation("设置设备亮灯策略")	    
     @PostMapping("v1/{imei}/lightingstrategy")	
     public Callable<BaseResponse> setDeviceSettingStrategy(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceLightingStrategy param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -173,7 +179,7 @@ public class DeviceMngController {
             }
         };
     }
-    
+	@ApiOperation("设置设备时间")	    
     @PostMapping("v1/{imei}/time")	
     public Callable<BaseResponse> setDeviceSettingTime(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceTime param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -186,7 +192,7 @@ public class DeviceMngController {
             }
         };
     }
-    
+	@ApiOperation("设置设备重启")	    
     @PostMapping("v1/{imei}/reboot")	
     public Callable<BaseResponse> setDeviceSettingReboot(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -199,7 +205,7 @@ public class DeviceMngController {
             }
         };
     }
-    
+	@ApiOperation("获取设备cellid")	    
 	@GetMapping("v1/{imei}/cellid")	
     public Callable<BaseResponse> getDeviceSettingCellId(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -212,7 +218,7 @@ public class DeviceMngController {
             }
         };
     }
-	
+	@ApiOperation("获取设备软件版本号")	    
 	@GetMapping("v1/{imei}/softversion")	
     public Callable<BaseResponse> getDeviceSettingSoftVersion(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -225,7 +231,7 @@ public class DeviceMngController {
             }
         };
     }
-	
+	@ApiOperation("获取设备硬件版本号")	    
 	@GetMapping("v1/{imei}/hardversion")	
     public Callable<BaseResponse> getDeviceSettingHardVersion(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -238,7 +244,7 @@ public class DeviceMngController {
             }
         };
     }
-	
+	@ApiOperation("获取设备耗电量")	    
 	@GetMapping("v1/{imei}/powerconsumption")	
     public Callable<BaseResponse> getDeviceSettingPowerConsumption(@RequestHeader("token") String token, @PathVariable("imei") String imei) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -251,7 +257,7 @@ public class DeviceMngController {
             }
         };
     }
-	
+	@ApiOperation("设置设备安装状态和角度阀值")	    
     @PostMapping("v1/{imei}/installationstateanglethreadhold")	
     public Callable<BaseResponse> setDeviceSettingInstallationstateAnglethreadhold(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDeviceInstallationstateAnglethreadhold param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -264,7 +270,7 @@ public class DeviceMngController {
             }
         };
     }
-
+	@ApiOperation("设置设备耗电量")	    
     @PostMapping("v1/{imei}/powerconsumption")	
     public Callable<BaseResponse> setDeviceSettingPowerConsumption(@RequestHeader("token") String token, @PathVariable("imei") String imei, @RequestBody ServiceSettingsDevicePowerConsumption param) {
 		logger.info("外部线程：" + Thread.currentThread().getName());
@@ -278,17 +284,18 @@ public class DeviceMngController {
         };
     }
     
-    
+	@ApiOperation("设置设备绑定")	        
     @PostMapping("v1/bind")
     public BaseResponse bind(@RequestHeader("token") String token, @RequestBody BindReqParam param) throws TokenInvalidException {
         return mDeviceMng.bind(token, param);
     }
-
+	@ApiOperation("设置设备解除绑定")	        
     @PostMapping("v1/{id}/unbind")
     public BaseResponse unbind(@RequestHeader("token") String token, @PathVariable("id") int devId) throws TokenInvalidException {
         return mDeviceMng.unbind(token, devId);
     }
-
+	
+	@ApiOperation("设置获取所有的设备imei")	        
     @GetMapping("v1/listall")
     public BaseResponse getDeviceListAll(@RequestHeader("token") String token) throws TokenInvalidException {
         return mDeviceMng.getDeviceList(token);
