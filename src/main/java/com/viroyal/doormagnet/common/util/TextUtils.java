@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextUtils {
     private final static char[] mChars = "0123456789ABCDEF".toCharArray();
@@ -15,6 +17,18 @@ public class TextUtils {
         return (value == null || value.length() == 0) ? true : false;
     }
 
+    
+	public static String replaceBlank(String str) {
+		String dest = "";
+		if (str != null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(str);
+			dest = m.replaceAll("");
+		}
+		return dest;
+	}
+	
+	
     public static String byte2HexStr(byte[] b) {
         StringBuilder sb = new StringBuilder();
         int iLen = b.length;

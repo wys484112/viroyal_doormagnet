@@ -113,8 +113,13 @@ public class MessageDispatcher {
 			logger.info("handleMessage thread==" + Thread.currentThread().getName());
 
 			DeviceMessage message = decodeMessage(ch, (byte[]) msg);
-			DeviceServer.ALLCHANNELS_GROUP.add(message);
-			onDevData(message);
+			if (message != null) {
+				DeviceServer.ALLCHANNELS_GROUP.add(message);
+				onDevData(message);
+			}else {
+				throw new Exception("message format illegal"); 
+			}
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			logger.error("error, handleMessage channel=" + ch + ", error=" + e.getMessage());
@@ -497,6 +502,16 @@ public class MessageDispatcher {
 		DeviceMessage base = new DeviceMessage();
 		String message = new String(msg).trim().toUpperCase(Locale.US);
 		logger.info("decodeMessagerevrevererererre=====:" + message.toString());
+
+		
+		message=TextUtils.replaceBlank(message);
+	    int index=message.indexOf("6F01");
+	    int index2=message.indexOf("0D0A0D0A");	
+	    if(index!=-1&&index2!=-1&&index2>index) {
+		    message=message.substring(index, index2+8);
+	    }else {
+	    	return null;
+	    }
 
 		base.setChannel(ch);
 
