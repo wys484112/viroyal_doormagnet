@@ -348,7 +348,7 @@ public class LoginController {
 	 */
 	@ApiOperation("获取验证码")
 	@GetMapping(value = "/getCheckCode")
-	public Result<Map<String,String>> getCheckCode(){
+	public Result<Map<String,String>> getCheckCode(){ 
 		Result<Map<String,String>> result = new Result<Map<String,String>>();
 		Map<String,String> map = new HashMap<String,String>();
 		try {
