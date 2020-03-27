@@ -15,12 +15,12 @@ public interface CommonConstant {
 	/**
 	 * 删除标志
 	 */
-	public static final Integer DEL_FLAG_1 = 1;
+	public static final Boolean DEL_FLAG_1 = true;
 
 	/**
 	 * 未删除
 	 */
-	public static final Integer DEL_FLAG_0 = 0;
+	public static final Boolean DEL_FLAG_0 = false;
 
 	/**
 	 * 系统日志类型： 登录
@@ -126,8 +126,8 @@ public interface CommonConstant {
     /**
      * 同步工作流引擎1同步0不同步
      */
-    public static final String ACT_SYNC_0 = "0";
-    public static final String ACT_SYNC_1 = "1";
+    public static final Boolean ACT_SYNC_0 = false;
+    public static final Boolean ACT_SYNC_1 = true;
     
     /**
      * 消息类型1:通知公告2:系统消息

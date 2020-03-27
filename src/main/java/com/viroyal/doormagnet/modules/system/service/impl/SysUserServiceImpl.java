@@ -1,11 +1,11 @@
 package com.viroyal.doormagnet.modules.system.service.impl;
 
 import com.alibaba.fastjson.JSON;
-
 import com.google.common.collect.Lists;
 import com.viroyal.doormagnet.common.api.vo.Result;
 import com.viroyal.doormagnet.common.constant.CacheConstant;
 import com.viroyal.doormagnet.common.constant.CommonConstant;
+import com.viroyal.doormagnet.common.mybatisplus.service.impl.ServiceImpl;
 import com.viroyal.doormagnet.common.system.api.ISysBaseAPI;
 import com.viroyal.doormagnet.common.system.vo.LoginUser;
 import com.viroyal.doormagnet.common.system.vo.SysUserCacheInfo;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * @Date: 2018-12-20
  */
 @Service
-public class SysUserServiceImpl implements ISysUserService {
+public class SysUserServiceImpl  extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {
 	private Logger logger = LoggerFactory.getLogger(SysUserServiceImpl.class);
 	
 	@Autowired
@@ -230,7 +230,7 @@ public class SysUserServiceImpl implements ISysUserService {
 			return result;
 		}
 		//情况2：根据用户信息查询，该用户已注销
-		if (CommonConstant.DEL_FLAG_1.toString().equals(sysUser.getDelFlag())) {
+		if (CommonConstant.DEL_FLAG_1.equals(sysUser.getDelFlag())) {
 			sysBaseAPI.addLog("用户登录失败，用户名:" + sysUser.getUsername() + "已注销！", CommonConstant.LOG_TYPE_1, null);
 			result.error500("该用户已注销");
 			return result;

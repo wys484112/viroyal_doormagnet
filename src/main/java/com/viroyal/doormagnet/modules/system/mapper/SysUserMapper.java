@@ -2,9 +2,10 @@ package com.viroyal.doormagnet.modules.system.mapper;
 
 import java.util.List;
 
+import com.viroyal.doormagnet.common.mybatisplus.mapper.BaseMapper;
 import com.viroyal.doormagnet.modules.system.model.SysUser;
 
-public interface SysUserMapper {
+public interface SysUserMapper  extends BaseMapper<SysUser> {
 	
 	/**
 	  * 通过用户账号查询用户信息

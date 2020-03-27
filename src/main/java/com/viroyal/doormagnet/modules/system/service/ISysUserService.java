@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.viroyal.doormagnet.common.api.vo.Result;
+import com.viroyal.doormagnet.common.mybatisplus.service.IService;
 import com.viroyal.doormagnet.common.system.vo.SysUserCacheInfo;
 import com.viroyal.doormagnet.modules.system.model.SysUser;
 
@@ -19,7 +20,7 @@ import com.viroyal.doormagnet.modules.system.model.SysUser;
  * @Author scott
  * @since 2018-12-20
  */
-public interface ISysUserService {
+public interface ISysUserService extends IService<SysUser> {
 
 	/**
 	 * 重置密码

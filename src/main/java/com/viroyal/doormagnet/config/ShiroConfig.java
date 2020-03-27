@@ -82,6 +82,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/sys/phoneLogin", "anon");//手机登录		
 		filterChainDefinitionMap.put("/sys/user/checkOnlyUser", "anon");//校验用户是否存在
 		filterChainDefinitionMap.put("/sys/user/register", "anon");//用户注册
+		filterChainDefinitionMap.put("/sys/user/list", "anon");//用户注册		
 		filterChainDefinitionMap.put("/sys/user/querySysUser", "anon");//根据手机号获取用户信息
 		filterChainDefinitionMap.put("/sys/user/phoneVerification", "anon");//用户忘记密码验证手机号
 		filterChainDefinitionMap.put("/sys/user/passwordChange", "anon");//用户更改密码
